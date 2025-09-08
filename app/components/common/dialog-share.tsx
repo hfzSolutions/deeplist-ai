@@ -102,7 +102,7 @@ export function DialogShare({
           <div className="space-y-3">
             <Button onClick={handleShare} className="w-full">
               <Share className="h-4 w-4 mr-2" />
-              {navigator.share ? 'Share' : 'Copy Link'}
+              {typeof navigator.share === 'function' ? 'Share' : 'Copy Link'}
             </Button>
 
             <Button

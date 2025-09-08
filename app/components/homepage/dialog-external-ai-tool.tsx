@@ -64,7 +64,7 @@ export function DialogExternalAITool({
     video_url: '',
     category_id: '',
     featured: false,
-    pricing: '',
+    pricing: null as 'free' | 'paid' | 'freemium' | null,
   });
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
@@ -83,7 +83,7 @@ export function DialogExternalAITool({
         video_url: tool.video_url || '',
         category_id: tool.category_id,
         featured: tool.featured || false,
-        pricing: tool.pricing || '',
+        pricing: tool.pricing || null,
       });
       setLogoPreview(tool.logo || null);
     } else {
@@ -95,7 +95,7 @@ export function DialogExternalAITool({
         video_url: '',
         category_id: '',
         featured: false,
-        pricing: '',
+        pricing: null,
       });
       setLogoPreview(null);
     }
@@ -197,7 +197,15 @@ export function DialogExternalAITool({
   };
 
   const handleInputChange = (field: string, value: string | boolean) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
+    setFormData((prev) => ({
+      ...prev,
+      [field]:
+        field === 'pricing'
+          ? value === ''
+            ? null
+            : (value as 'free' | 'paid' | 'freemium')
+          : value,
+    }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -498,7 +506,7 @@ export function DialogExternalAITool({
               <div className="space-y-2">
                 <Label htmlFor="pricing">Pricing</Label>
                 <Select
-                  value={formData.pricing}
+                  value={formData.pricing || ''}
                   onValueChange={(value) => handleInputChange('pricing', value)}
                 >
                   <SelectTrigger>
@@ -703,7 +711,7 @@ export function DialogExternalAITool({
             <div className="space-y-2">
               <Label htmlFor="pricing">Pricing</Label>
               <Select
-                value={formData.pricing}
+                value={formData.pricing || ''}
                 onValueChange={(value) => handleInputChange('pricing', value)}
               >
                 <SelectTrigger>
