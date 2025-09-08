@@ -91,7 +91,7 @@ export function useChatCore({
 
   // Custom onFinish handler to attach agent data to assistant messages
   const handleFinish = useCallback(
-    (message: MessageAISDK) => {
+    (message: Message) => {
       // Attach agent data to assistant messages
       if (message.role === 'assistant' && selectedAgent) {
         const messageWithAgent = {
@@ -145,16 +145,16 @@ export function useChatCore({
       if (
         lastMessage.role === 'assistant' &&
         status === 'streaming' &&
-        !lastMessage.agent
+        !(lastMessage as any).agent_id
       ) {
         setMessages((prev) => {
           const updated = [...prev];
           const lastIndex = updated.length - 1;
           if (
             updated[lastIndex].role === 'assistant' &&
-            !updated[lastIndex].agent
+            !(updated[lastIndex] as any).agent_id
           ) {
-            updated[lastIndex] = {
+            (updated[lastIndex] as any) = {
               ...updated[lastIndex],
               agent_id: selectedAgent.id,
               agent: {
