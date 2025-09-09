@@ -6,19 +6,14 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
-import { useHomepage } from '@/lib/homepage-store/provider';
 import { Storefront } from '@phosphor-icons/react/dist/ssr';
-import { usePathname, useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 
 export function ButtonStore() {
-  const pathname = usePathname();
   const router = useRouter();
-  const { forceAgentStoreView } = useHomepage();
 
   const handleStoreClick = () => {
-    const currentChatUrl = pathname.startsWith('/c/') ? pathname : undefined;
-    router.push('/');
-    forceAgentStoreView(currentChatUrl);
+    router.push('/store');
   };
 
   useKeyShortcut(

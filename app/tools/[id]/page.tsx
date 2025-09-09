@@ -1,33 +1,33 @@
-'use client'
+'use client';
 
-import { useEffect } from 'react'
-import { useRouter } from 'next/navigation'
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 
 type Props = {
-  params: Promise<{ id: string }>
-}
+  params: Promise<{ id: string }>;
+};
 
 export default function ToolRedirectPage({ params }: Props) {
-  const router = useRouter()
+  const router = useRouter();
 
   useEffect(() => {
     const handleRedirect = async () => {
-      const { id } = await params
-      
+      const { id } = await params;
+
       // Validate the ID parameter
       if (!id || typeof id !== 'string' || id.trim() === '') {
         // Invalid ID - redirect to homepage without tool parameter
-        router.replace('/')
-        return
+        router.replace('/');
+        return;
       }
-      
-      // Redirect to homepage with tool ID as a query parameter
-      // The homepage will detect this and open the tool details dialog
-      router.replace(`/?tool=${encodeURIComponent(id.trim())}`)
-    }
 
-    handleRedirect()
-  }, [params, router])
+      // Redirect to store page with tool ID as a query parameter
+      // The store page will detect this and open the tool details dialog
+      router.replace(`/store?tool=${encodeURIComponent(id.trim())}`);
+    };
+
+    handleRedirect();
+  }, [params, router]);
 
   // Show a simple loading state while redirecting
   return (
@@ -37,5 +37,5 @@ export default function ToolRedirectPage({ params }: Props) {
         <p className="text-gray-600 dark:text-gray-400">Redirecting...</p>
       </div>
     </div>
-  )
+  );
 }
