@@ -8,7 +8,7 @@ import { API_ROUTE_CHAT } from '@/lib/routes';
 import type { UserProfile } from '@/lib/user/types';
 import type { Message } from '@ai-sdk/react';
 import { useChat } from '@ai-sdk/react';
-import { useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 type UseChatCoreProps = {
@@ -61,6 +61,7 @@ export function useChatCore({
   const prevChatIdRef = useRef<string | null>(chatId);
   const isAuthenticated = useMemo(() => !!user?.id, [user?.id]);
   const { selectedAgent } = useAgents();
+  const router = useRouter();
   const systemPrompt = useMemo(
     () =>
       selectedAgent?.system_prompt ||
@@ -176,10 +177,10 @@ export function useChatCore({
     setIsSubmitting(true);
 
     if (!isAuthenticated || !user?.id) {
-      toast({
-        title: 'Please sign in to send messages',
-        status: 'error',
-      });
+      const returnUrl = encodeURIComponent(
+        window.location.pathname + window.location.search
+      );
+      router.push(`/auth?returnUrl=${returnUrl}`);
       setIsSubmitting(false);
       return;
     }
@@ -310,6 +311,7 @@ export function useChatCore({
     messages.length,
     bumpChat,
     setIsSubmitting,
+    router,
   ]);
 
   // Handle suggestion
@@ -336,10 +338,10 @@ export function useChatCore({
 
       try {
         if (!isAuthenticated || !user?.id) {
-          toast({
-            title: 'Please sign in to send messages',
-            status: 'error',
-          });
+          const returnUrl = encodeURIComponent(
+            window.location.pathname + window.location.search
+          );
+          router.push(`/auth?returnUrl=${returnUrl}`);
           setMessages((prev) => prev.filter((msg) => msg.id !== optimisticId));
           return;
         }
@@ -395,16 +397,17 @@ export function useChatCore({
       setMessages,
       setIsSubmitting,
       selectedAgent,
+      router,
     ]
   );
 
   // Handle reload
   const handleReload = useCallback(async () => {
     if (!isAuthenticated || !user?.id) {
-      toast({
-        title: 'Please sign in to reload messages',
-        status: 'error',
-      });
+      const returnUrl = encodeURIComponent(
+        window.location.pathname + window.location.search
+      );
+      router.push(`/auth?returnUrl=${returnUrl}`);
       return;
     }
 
@@ -430,6 +433,7 @@ export function useChatCore({
     systemPrompt,
     selectedAgent,
     reload,
+    router,
   ]);
 
   // Handle input change - now with access to the real setInput function!

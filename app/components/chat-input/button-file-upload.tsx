@@ -2,50 +2,43 @@ import {
   FileUpload,
   FileUploadContent,
   FileUploadTrigger,
-} from "@/components/prompt-kit/file-upload"
-import { Button } from "@/components/ui/button"
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog"
+} from '@/components/prompt-kit/file-upload';
+import { Button } from '@/components/ui/button';
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover"
+} from '@/components/ui/popover';
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
-} from "@/components/ui/tooltip"
-import { getModelInfo } from "@/lib/models"
-import { isSupabaseEnabled } from "@/lib/supabase/config"
-import { cn } from "@/lib/utils"
-import { FileArrowUp, Paperclip } from "@phosphor-icons/react"
-import React, { useState } from "react"
-import { LoginPrompt } from "@/app/components/auth/login-prompt"
+} from '@/components/ui/tooltip';
+import { getModelInfo } from '@/lib/models';
+import { isSupabaseEnabled } from '@/lib/supabase/config';
+import { cn } from '@/lib/utils';
+import { FileArrowUp, Paperclip } from '@phosphor-icons/react';
+import React from 'react';
+import { useRouter } from 'next/navigation';
 
 type ButtonFileUploadProps = {
-  onFileUpload: (files: File[]) => void
-  isUserAuthenticated: boolean
-  model: string
-}
+  onFileUpload: (files: File[]) => void;
+  isUserAuthenticated: boolean;
+  model: string;
+};
 
 export function ButtonFileUpload({
   onFileUpload,
   isUserAuthenticated,
   model,
 }: ButtonFileUploadProps) {
-  const [loginPromptOpen, setLoginPromptOpen] = useState(false)
+  const router = useRouter();
 
   if (!isSupabaseEnabled) {
-    return null
+    return null;
   }
 
-  const isFileUploadAvailable = getModelInfo(model)?.vision
+  const isFileUploadAvailable = getModelInfo(model)?.vision;
 
   if (!isFileUploadAvailable) {
     return (
@@ -74,58 +67,38 @@ export function ButtonFileUpload({
           </div>
         </PopoverContent>
       </Popover>
-    )
+    );
   }
 
   const handleFileUploadClick = () => {
     if (!isUserAuthenticated) {
-      setLoginPromptOpen(true)
-      return
+      const returnUrl = encodeURIComponent(
+        window.location.pathname + window.location.search
+      );
+      router.push(`/auth?returnUrl=${returnUrl}`);
+      return;
     }
     // For authenticated users, the FileUpload component will handle the click
-  }
+  };
 
   if (!isUserAuthenticated) {
     return (
-      <>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              size="sm"
-              variant="secondary"
-              className="border-border dark:bg-secondary size-9 rounded-full border bg-transparent"
-              type="button"
-              aria-label="Add files"
-              onClick={handleFileUploadClick}
-            >
-              <Paperclip className="size-4" />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent>Add files</TooltipContent>
-        </Tooltip>
-
-        {/* Login Prompt Dialog */}
-        <Dialog open={loginPromptOpen} onOpenChange={setLoginPromptOpen}>
-          <DialogContent className="max-h-[90vh] w-full max-w-md overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle>File Upload</DialogTitle>
-              <DialogDescription>
-                Sign in to upload files and enhance your conversations.
-              </DialogDescription>
-            </DialogHeader>
-            <div className="py-4">
-              <LoginPrompt
-                title="Login Required"
-                description="You need to be logged in to upload files. Please sign in to continue."
-                action="upload files"
-                actionText="Sign In"
-                className="border-0 shadow-none"
-              />
-            </div>
-          </DialogContent>
-        </Dialog>
-      </>
-    )
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button
+            size="sm"
+            variant="secondary"
+            className="border-border dark:bg-secondary size-9 rounded-full border bg-transparent"
+            type="button"
+            aria-label="Add files"
+            onClick={handleFileUploadClick}
+          >
+            <Paperclip className="size-4" />
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent>Add files</TooltipContent>
+      </Tooltip>
+    );
   }
 
   return (
@@ -142,8 +115,8 @@ export function ButtonFileUpload({
               size="sm"
               variant="secondary"
               className={cn(
-                "border-border dark:bg-secondary size-9 rounded-full border bg-transparent",
-                !isUserAuthenticated && "opacity-50"
+                'border-border dark:bg-secondary size-9 rounded-full border bg-transparent',
+                !isUserAuthenticated && 'opacity-50'
               )}
               type="button"
               disabled={!isUserAuthenticated}
@@ -165,5 +138,5 @@ export function ButtonFileUpload({
         </div>
       </FileUploadContent>
     </FileUpload>
-  )
+  );
 }

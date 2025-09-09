@@ -1,33 +1,28 @@
-import { Button } from "@/components/ui/button"
-import { Drawer, DrawerContent, DrawerTrigger } from "@/components/ui/drawer"
-import { Input } from "@/components/ui/input"
-import { ScrollArea } from "@/components/ui/scroll-area"
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip"
-import { Chats } from "@/lib/chat-store/types"
+import { Button } from '@/components/ui/button';
+import { Drawer, DrawerContent, DrawerTrigger } from '@/components/ui/drawer';
+import { Input } from '@/components/ui/input';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Chats } from '@/lib/chat-store/types';
 import {
   Check,
   MagnifyingGlass,
   PencilSimple,
   TrashSimple,
   X,
-} from "@phosphor-icons/react"
-import Link from "next/link"
-import { useParams } from "next/navigation"
-import { useCallback, useMemo, useState } from "react"
-import { formatDate, groupChatsByDate } from "./utils"
+} from '@phosphor-icons/react';
+import Link from 'next/link';
+import { useParams } from 'next/navigation';
+import { useCallback, useMemo, useState } from 'react';
+import { formatDate, groupChatsByDate } from './utils';
 
 type DrawerHistoryProps = {
-  chatHistory: Chats[]
-  onSaveEdit: (id: string, newTitle: string) => Promise<void>
-  onConfirmDelete: (id: string) => Promise<void>
-  trigger: React.ReactNode
-  isOpen: boolean
-  setIsOpen: (open: boolean) => void
-}
+  chatHistory: Chats[];
+  onSaveEdit: (id: string, newTitle: string) => Promise<void>;
+  onConfirmDelete: (id: string) => Promise<void>;
+  trigger: React.ReactNode;
+  isOpen: boolean;
+  setIsOpen: (open: boolean) => void;
+};
 
 export function DrawerHistory({
   chatHistory,
@@ -37,71 +32,74 @@ export function DrawerHistory({
   isOpen,
   setIsOpen,
 }: DrawerHistoryProps) {
-  const [searchQuery, setSearchQuery] = useState("")
-  const [editingId, setEditingId] = useState<string | null>(null)
-  const [editTitle, setEditTitle] = useState("")
-  const [deletingId, setDeletingId] = useState<string | null>(null)
-  const params = useParams<{ chatId: string }>()
+  const [searchQuery, setSearchQuery] = useState('');
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editTitle, setEditTitle] = useState('');
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const params = useParams<{ chatId: string }>();
 
-  const handleOpenChange = useCallback((open: boolean) => {
-    setIsOpen(open)
-    if (!open) {
-      setSearchQuery("")
-      setEditingId(null)
-      setEditTitle("")
-      setDeletingId(null)
-    }
-  }, [setIsOpen])
+  const handleOpenChange = useCallback(
+    (open: boolean) => {
+      setIsOpen(open);
+      if (!open) {
+        setSearchQuery('');
+        setEditingId(null);
+        setEditTitle('');
+        setDeletingId(null);
+      }
+    },
+    [setIsOpen]
+  );
 
   const handleEdit = useCallback((chat: Chats) => {
-    setEditingId(chat.id)
-    setEditTitle(chat.title || "")
-  }, [])
+    setEditingId(chat.id);
+    setEditTitle(chat.title || '');
+  }, []);
 
   const handleSaveEdit = useCallback(
     async (id: string) => {
-      setEditingId(null)
-      await onSaveEdit(id, editTitle)
+      setEditingId(null);
+      await onSaveEdit(id, editTitle);
     },
     [editTitle, onSaveEdit]
-  )
+  );
 
   const handleCancelEdit = useCallback(() => {
-    setEditingId(null)
-    setEditTitle("")
-  }, [])
+    setEditingId(null);
+    setEditTitle('');
+  }, []);
 
   const handleDelete = useCallback((id: string) => {
-    setDeletingId(id)
-  }, [])
+    setDeletingId(id);
+  }, []);
 
   const handleConfirmDelete = useCallback(
     async (id: string) => {
-      setDeletingId(null)
-      await onConfirmDelete(id)
+      setDeletingId(null);
+      await onConfirmDelete(id);
     },
     [onConfirmDelete]
-  )
+  );
 
   const handleCancelDelete = useCallback(() => {
-    setDeletingId(null)
-  }, [])
+    setDeletingId(null);
+  }, []);
 
   // Memoize filtered chats to avoid recalculating on every render
   const filteredChat = useMemo(() => {
-    const query = searchQuery.toLowerCase()
+    const query = searchQuery.toLowerCase();
     return query
       ? chatHistory.filter((chat) =>
-          (chat.title || "").toLowerCase().includes(query)
+          (chat.title || '').toLowerCase().includes(query)
         )
-      : chatHistory
-  }, [chatHistory, searchQuery])
+      : chatHistory;
+  }, [chatHistory, searchQuery]);
 
   // Group chats by time periods - memoized to avoid recalculation
   const groupedChats = useMemo(
     () => groupChatsByDate(chatHistory, searchQuery),
     [chatHistory, searchQuery]
-  )
+  );
 
   // Render chat item
   const renderChatItem = useCallback(
@@ -113,8 +111,8 @@ export function DrawerHistory({
               <form
                 className="flex w-full items-center justify-between"
                 onSubmit={(e) => {
-                  e.preventDefault()
-                  handleSaveEdit(chat.id)
+                  e.preventDefault();
+                  handleSaveEdit(chat.id);
                 }}
               >
                 <Input
@@ -123,9 +121,9 @@ export function DrawerHistory({
                   className="h-8 flex-1"
                   autoFocus
                   onKeyDown={(e) => {
-                    if (e.key === "Enter") {
-                      e.preventDefault()
-                      handleSaveEdit(chat.id)
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      handleSaveEdit(chat.id);
                     }
                   }}
                 />
@@ -154,8 +152,8 @@ export function DrawerHistory({
             <div className="bg-accent flex items-center justify-between rounded-lg px-2 py-2.5">
               <form
                 onSubmit={(e) => {
-                  e.preventDefault()
-                  handleConfirmDelete(chat.id)
+                  e.preventDefault();
+                  handleConfirmDelete(chat.id);
                 }}
                 className="flex w-full items-center justify-between"
               >
@@ -166,12 +164,12 @@ export function DrawerHistory({
                     className="sr-only"
                     autoFocus
                     onKeyDown={(e) => {
-                      if (e.key === "Escape") {
-                        e.preventDefault()
-                        handleCancelDelete()
-                      } else if (e.key === "Enter") {
-                        e.preventDefault()
-                        handleConfirmDelete(chat.id)
+                      if (e.key === 'Escape') {
+                        e.preventDefault();
+                        handleCancelDelete();
+                      } else if (e.key === 'Enter') {
+                        e.preventDefault();
+                        handleConfirmDelete(chat.id);
                       }
                     }}
                   />
@@ -202,7 +200,7 @@ export function DrawerHistory({
               className="group flex items-center justify-between rounded-lg px-2 py-1.5"
               onClick={() => {
                 if (params.chatId === chat.id) {
-                  handleOpenChange(false)
+                  handleOpenChange(false);
                 }
               }}
             >
@@ -213,7 +211,7 @@ export function DrawerHistory({
                 prefetch
               >
                 <span className="line-clamp-1 text-base font-normal">
-                  {chat.title || "Untitled Chat"}
+                  {chat.title || 'Untitled Chat'}
                 </span>
                 <span className="mr-2 text-xs font-normal text-gray-500">
                   {formatDate(chat?.created_at)}
@@ -226,8 +224,8 @@ export function DrawerHistory({
                     variant="ghost"
                     className="text-muted-foreground hover:text-foreground size-8"
                     onClick={(e) => {
-                      e.preventDefault()
-                      handleEdit(chat)
+                      e.preventDefault();
+                      handleEdit(chat);
                     }}
                     type="button"
                   >
@@ -238,8 +236,8 @@ export function DrawerHistory({
                     variant="ghost"
                     className="text-muted-foreground hover:text-destructive size-8"
                     onClick={(e) => {
-                      e.preventDefault()
-                      handleDelete(chat.id)
+                      e.preventDefault();
+                      handleDelete(chat.id);
                     }}
                     type="button"
                   >
@@ -265,16 +263,11 @@ export function DrawerHistory({
       handleEdit,
       handleDelete,
     ]
-  )
+  );
 
   return (
     <Drawer open={isOpen} onOpenChange={handleOpenChange}>
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <DrawerTrigger asChild>{trigger}</DrawerTrigger>
-        </TooltipTrigger>
-        <TooltipContent>History</TooltipContent>
-      </Tooltip>
+      <DrawerTrigger asChild>{trigger}</DrawerTrigger>
       <DrawerContent>
         <div className="flex h-dvh max-h-[80vh] flex-col">
           <div className="border-b p-4 pb-3">
@@ -318,5 +311,5 @@ export function DrawerHistory({
         </div>
       </DrawerContent>
     </Drawer>
-  )
+  );
 }

@@ -46,7 +46,7 @@ export function AppSidebar() {
   return (
     <Sidebar collapsible="offcanvas" variant="sidebar" className="border-none">
       <SidebarHeader className="h-14 pl-3">
-        <div className="flex justify-between">
+        <div className="flex justify-end">
           {isMobile ? (
             <button
               type="button"
@@ -73,6 +73,9 @@ export function AppSidebar() {
                   : undefined;
                 router.push('/');
                 forceAgentStoreView(currentChatUrl);
+                if (isMobile) {
+                  setOpenMobile(false);
+                }
               }}
             >
               <div className="flex items-center gap-2">
@@ -118,6 +121,9 @@ export function AppSidebar() {
               type="button"
               onClick={() => {
                 router.push('/store');
+                if (isMobile) {
+                  setOpenMobile(false);
+                }
               }}
             >
               <div className="flex items-center gap-2">
@@ -141,7 +147,12 @@ export function AppSidebar() {
                 <button
                   className="hover:bg-accent/80 hover:text-foreground group/admin relative inline-flex w-full items-center rounded-md bg-transparent px-2 py-2 text-sm transition-colors"
                   type="button"
-                  onClick={() => router.push('/admin')}
+                  onClick={() => {
+                    router.push('/admin');
+                    if (isMobile) {
+                      setOpenMobile(false);
+                    }
+                  }}
                 >
                   <div className="flex items-center gap-2">
                     <Gear size={20} />
@@ -165,7 +176,15 @@ export function AppSidebar() {
           <SidebarUserMenu />
         ) : (
           <button
-            onClick={() => router.push('/auth')}
+            onClick={() => {
+              const returnUrl = encodeURIComponent(
+                window.location.pathname + window.location.search
+              );
+              router.push(`/auth?returnUrl=${returnUrl}`);
+              if (isMobile) {
+                setOpenMobile(false);
+              }
+            }}
             className="hover:bg-muted flex items-center gap-2 rounded-md p-2 w-full"
             aria-label="Login to your account"
           >

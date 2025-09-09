@@ -60,6 +60,7 @@ import {
   CaretUp,
 } from '@phosphor-icons/react';
 import { useEffect, useRef, useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 type DialogCreateAgentProps = {
   isOpen: boolean;
@@ -72,6 +73,7 @@ export function DialogCreateAgent({
   setIsOpen,
   agent,
 }: DialogCreateAgentProps) {
+  const router = useRouter();
   const { user } = useUser();
   const { createAgent, updateAgent } = useAgents();
   const { models } = useModel();
@@ -92,6 +94,18 @@ export function DialogCreateAgent({
   const [hasAttemptedSubmit, setHasAttemptedSubmit] = useState(false);
   const [isMoreSectionOpen, setIsMoreSectionOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Redirect to auth page if dialog is opened and user is not authenticated
+  useEffect(() => {
+    if (isOpen && !user) {
+      const returnUrl = encodeURIComponent(
+        window.location.pathname + window.location.search
+      );
+      router.push(`/auth?returnUrl=${returnUrl}`);
+      setIsOpen(false);
+    }
+  }, [isOpen, user, router, setIsOpen]);
+
   // Get default model - prefer first accessible model or fallback to first available
   const getDefaultModel = () => {
     if (models.length === 0) return 'none';
@@ -623,31 +637,9 @@ export function DialogCreateAgent({
     {} as Record<string, typeof models>
   );
 
-  // Show login prompt if user is not authenticated
+  // If user is not authenticated, don't render anything (redirect will happen in useEffect)
   if (!user) {
-    return (
-      <Dialog open={isOpen} onOpenChange={setIsOpen}>
-        <DialogContent className="max-h-[90vh] w-full max-w-md overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <Robot className="h-5 w-5" />
-              Create New Agent
-            </DialogTitle>
-            <DialogDescription>
-              Sign in to create and save your custom AI agents.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="py-4">
-            <LoginPrompt
-              title="Login to Create Agents"
-              description="You need to be logged in to create and save custom AI agents. Sign in to get started."
-              actionText="Sign In to Continue"
-              className="border-0 shadow-none"
-            />
-          </div>
-        </DialogContent>
-      </Dialog>
-    );
+    return null;
   }
 
   if (isMobile) {
@@ -763,7 +755,9 @@ export function DialogCreateAgent({
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
                         <MagicWand className="h-4 w-4 text-primary" />
-                        <h4 className="text-sm font-medium">Auto Generate Agent</h4>
+                        <h4 className="text-sm font-medium">
+                          Auto Generate Agent
+                        </h4>
                       </div>
                       <Button
                         type="button"
@@ -780,17 +774,22 @@ export function DialogCreateAgent({
                     </div>
                     <div className="space-y-3">
                       <div className="space-y-2">
-                        <Label htmlFor="auto-generate-prompt">Agent Description</Label>
+                        <Label htmlFor="auto-generate-prompt">
+                          Agent Description
+                        </Label>
                         <Textarea
                           id="auto-generate-prompt"
                           placeholder="e.g., A coding assistant that helps with Python development, A creative writing helper for storytelling, A customer support agent for e-commerce..."
                           value={autoGeneratePrompt}
-                          onChange={(e) => setAutoGeneratePrompt(e.target.value)}
+                          onChange={(e) =>
+                            setAutoGeneratePrompt(e.target.value)
+                          }
                           rows={3}
                           disabled={isAutoGenerating}
                         />
                         <p className="text-xs text-muted-foreground">
-                          Be specific about the agent's purpose, expertise, and personality for better results.
+                          Be specific about the agent's purpose, expertise, and
+                          personality for better results.
                         </p>
                       </div>
                       <div className="flex gap-2">
@@ -810,7 +809,9 @@ export function DialogCreateAgent({
                           type="button"
                           size="sm"
                           onClick={handleAutoGenerate}
-                          disabled={isAutoGenerating || !autoGeneratePrompt.trim()}
+                          disabled={
+                            isAutoGenerating || !autoGeneratePrompt.trim()
+                          }
                           className="flex items-center gap-2"
                         >
                           {isAutoGenerating ? (
@@ -1233,7 +1234,9 @@ export function DialogCreateAgent({
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <MagicWand className="h-4 w-4 text-primary" />
-                      <h4 className="text-sm font-medium">Auto Generate Agent</h4>
+                      <h4 className="text-sm font-medium">
+                        Auto Generate Agent
+                      </h4>
                     </div>
                     <Button
                       type="button"
@@ -1250,7 +1253,9 @@ export function DialogCreateAgent({
                   </div>
                   <div className="space-y-3">
                     <div className="space-y-2">
-                      <Label htmlFor="auto-generate-prompt-desktop">Agent Description</Label>
+                      <Label htmlFor="auto-generate-prompt-desktop">
+                        Agent Description
+                      </Label>
                       <Textarea
                         id="auto-generate-prompt-desktop"
                         placeholder="e.g., A coding assistant that helps with Python development, A creative writing helper for storytelling, A customer support agent for e-commerce..."
@@ -1260,7 +1265,8 @@ export function DialogCreateAgent({
                         disabled={isAutoGenerating}
                       />
                       <p className="text-xs text-muted-foreground">
-                        Be specific about the agent's purpose, expertise, and personality for better results.
+                        Be specific about the agent's purpose, expertise, and
+                        personality for better results.
                       </p>
                     </div>
                     <div className="flex gap-2">
@@ -1280,7 +1286,9 @@ export function DialogCreateAgent({
                         type="button"
                         size="sm"
                         onClick={handleAutoGenerate}
-                        disabled={isAutoGenerating || !autoGeneratePrompt.trim()}
+                        disabled={
+                          isAutoGenerating || !autoGeneratePrompt.trim()
+                        }
                         className="flex items-center gap-2"
                       >
                         {isAutoGenerating ? (
@@ -1709,8 +1717,6 @@ export function DialogCreateAgent({
           </DialogFooter>
         </DialogContent>
       </Dialog>
-
-
     </Dialog>
   );
 }

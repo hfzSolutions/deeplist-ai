@@ -228,7 +228,7 @@ export function StoreContainer() {
   return (
     <div className="flex h-full flex-col">
       {/* Header with Navigation Tabs */}
-      <div className="bg-background/95 supports-[backdrop-filter]:bg-background/60 border-b px-4 py-6 backdrop-blur sm:px-6">
+      <div className="bg-background/95 supports-[backdrop-filter]:bg-background/60 border-b px-4 py-6 backdrop-blur sm:px-6 sm:mt-0 mt-12">
         <div className="mx-auto max-w-6xl">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">

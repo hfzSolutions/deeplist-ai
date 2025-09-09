@@ -7,6 +7,7 @@ import { ButtonStore } from '@/app/components/layout/button-store';
 import { useBreakpoint } from '@/app/hooks/use-breakpoint';
 import { DeeplistAIIcon } from '@/components/icons/deeplist-ai';
 import { Button } from '@/components/ui/button';
+import { useSidebar } from '@/components/ui/sidebar';
 import { APP_NAME } from '@/lib/config';
 import { useUserPreferences } from '@/lib/user-preference-store/provider';
 import { useUser } from '@/lib/user-store/provider';
@@ -20,11 +21,13 @@ export function Header({ hasSidebar }: { hasSidebar: boolean }) {
   const isMobile = useBreakpoint(768);
   const { user } = useUser();
   const { preferences } = useUserPreferences();
+  const { open, openMobile } = useSidebar();
   const isMultiModelEnabled = preferences.multiModelEnabled;
   const pathname = usePathname();
 
   const isLoggedIn = !!user;
   const isOnStorePage = pathname === '/';
+  const isSidebarOpen = isMobile ? openMobile : open;
 
   return (
     <header className="h-app-header pointer-events-none fixed top-0 right-0 left-0 z-[9999]">
@@ -39,7 +42,9 @@ export function Header({ hasSidebar }: { hasSidebar: boolean }) {
                 <DeeplistAIIcon className="mr-1 size-5 sm:size-6 flex-shrink-0" />
                 <span className="truncate">{APP_NAME}</span>
               </Link>
-              {hasSidebar && isMobile && <HeaderSidebarTrigger />}
+              {hasSidebar && isMobile && !isSidebarOpen && (
+                <HeaderSidebarTrigger />
+              )}
             </div>
           </div>
           <div className="flex-shrink-0" />

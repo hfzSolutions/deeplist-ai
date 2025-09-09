@@ -27,12 +27,15 @@ import {
   HeartStraight,
   Plus,
   Robot,
+  Storefront,
   User,
 } from '@phosphor-icons/react';
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { DialogCreateAgent } from './dialog-create-agent';
 
 export function AgentSelector() {
+  const router = useRouter();
   const {
     agents,
     isLoading,
@@ -234,6 +237,16 @@ export function AgentSelector() {
           >
             <Plus size={16} />
             <span>Create New Agent</span>
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            onClick={() => {
+              router.push('/store');
+              setIsOpen(false);
+            }}
+            className="flex cursor-pointer items-center gap-2 text-green-600 hover:text-green-700"
+          >
+            <Storefront size={16} />
+            <span>Visit Store</span>
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
