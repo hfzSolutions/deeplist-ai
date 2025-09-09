@@ -50,10 +50,6 @@ export function MessageAssistant({
   // Use agent prop directly instead of searching through agents array
   const agentData = agent || null;
 
-  // Debug logging
-  if (process.env.NODE_ENV === 'development') {
-    console.log('MessageAssistant - agentData:', agentData);
-  }
   const sources = getSources(parts);
   const toolInvocationParts = parts?.filter(
     (part) => part.type === 'tool-invocation'

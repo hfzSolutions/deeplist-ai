@@ -113,7 +113,7 @@ export function useChatCore({
 
   // Initialize useChat
   const {
-    messages,
+    messages: rawMessages,
     input,
     handleSubmit,
     status,
@@ -131,44 +131,35 @@ export function useChatCore({
     onError: handleError,
   });
 
+  // Transform messages to include agent data for assistant messages
+  const messages = useMemo(() => {
+    return rawMessages.map((message) => {
+      // Only add agent data to assistant messages that don't already have it
+      if (
+        message.role === 'assistant' &&
+        selectedAgent &&
+        !(message as any).agent_id
+      ) {
+        return {
+          ...message,
+          agent_id: selectedAgent.id,
+          agent: {
+            id: selectedAgent.id,
+            name: selectedAgent.name,
+            avatar_url: selectedAgent.avatar_url,
+          },
+        };
+      }
+      return message;
+    });
+  }, [rawMessages, selectedAgent]);
+
   // Handle search params on mount
   useEffect(() => {
     if (prompt && typeof window !== 'undefined') {
       requestAnimationFrame(() => setInput(prompt));
     }
   }, [prompt, setInput]);
-
-  // Attach agent data to streaming assistant messages
-  useEffect(() => {
-    if (!selectedAgent || messages.length === 0) return;
-
-    const lastMessage = messages[messages.length - 1];
-    if (
-      lastMessage.role === 'assistant' &&
-      status === 'streaming' &&
-      !(lastMessage as any).agent_id
-    ) {
-      setMessages((prev) => {
-        const updated = [...prev];
-        const lastIndex = updated.length - 1;
-        if (
-          updated[lastIndex].role === 'assistant' &&
-          !(updated[lastIndex] as any).agent_id
-        ) {
-          (updated[lastIndex] as any) = {
-            ...updated[lastIndex],
-            agent_id: selectedAgent.id,
-            agent: {
-              id: selectedAgent.id,
-              name: selectedAgent.name,
-              avatar_url: selectedAgent.avatar_url,
-            },
-          };
-        }
-        return updated;
-      });
-    }
-  }, [selectedAgent, messages.length, status, setMessages]);
 
   // Reset messages when navigating from a chat to home
   if (
@@ -375,6 +366,7 @@ export function useChatCore({
             model: selectedModel,
             isAuthenticated,
             systemPrompt: SYSTEM_PROMPT_DEFAULT,
+            agentId: selectedAgent?.id || null,
           },
         };
 
@@ -402,6 +394,7 @@ export function useChatCore({
       isAuthenticated,
       setMessages,
       setIsSubmitting,
+      selectedAgent,
     ]
   );
 
@@ -424,11 +417,20 @@ export function useChatCore({
         model: selectedModel,
         isAuthenticated,
         systemPrompt: systemPrompt || SYSTEM_PROMPT_DEFAULT,
+        agentId: selectedAgent?.id || null,
       },
     };
 
     reload(options);
-  }, [user, chatId, selectedModel, isAuthenticated, systemPrompt, reload]);
+  }, [
+    user,
+    chatId,
+    selectedModel,
+    isAuthenticated,
+    systemPrompt,
+    selectedAgent,
+    reload,
+  ]);
 
   // Handle input change - now with access to the real setInput function!
   const { setDraftValue } = useChatDraft(chatId);
