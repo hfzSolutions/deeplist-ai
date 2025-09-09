@@ -5,12 +5,12 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Eye, EyeSlash } from '@phosphor-icons/react';
 import Link from 'next/link';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { Suspense, useEffect, useState } from 'react';
+import { createClient } from '@/lib/supabase/client';
 
 function ResetPasswordContent() {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -18,48 +18,46 @@ function ResetPasswordContent() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isSuccess, setIsSuccess] = useState(false);
-  const [tokens, setTokens] = useState<{
-    access_token: string | null;
-    refresh_token: string | null;
-  }>({ access_token: null, refresh_token: null });
+  const [isValidSession, setIsValidSession] = useState(false);
+  const [isCheckingSession, setIsCheckingSession] = useState(true);
 
   useEffect(() => {
-    // Extract tokens from URL hash (Supabase auth callback format)
-    const hash = window.location.hash.substring(1);
-    const searchParams = new URLSearchParams(window.location.search);
-    const hashParams = new URLSearchParams(hash);
+    // Check if user is authenticated (Supabase handles this automatically after reset link click)
+    const checkSession = async () => {
+      const supabase = createClient();
+      if (!supabase) {
+        setError('Failed to initialize authentication. Please try again.');
+        setIsCheckingSession(false);
+        return;
+      }
 
-    // Check for tokens in hash first (Supabase redirect format)
-    let access_token = hashParams.get('access_token');
-    let refresh_token = hashParams.get('refresh_token');
-    let error_description = hashParams.get('error_description');
+      const {
+        data: { session },
+        error,
+      } = await supabase.auth.getSession();
 
-    // If not in hash, check search parameters (fallback)
-    if (!access_token || !refresh_token) {
-      access_token = searchParams.get('access_token');
-      refresh_token = searchParams.get('refresh_token');
-      error_description = searchParams.get('error_description');
-    }
+      if (error) {
+        console.error('Session check error:', error);
+        setError(
+          'Invalid or expired reset link. Please request a new password reset.'
+        );
+        setIsCheckingSession(false);
+        return;
+      }
 
-    if (error_description) {
-      setError(decodeURIComponent(error_description));
-      return;
-    }
+      if (!session) {
+        setError(
+          'Invalid or expired reset link. Please request a new password reset.'
+        );
+        setIsCheckingSession(false);
+        return;
+      }
 
-    if (!access_token || !refresh_token) {
-      console.error('Missing tokens:', {
-        access_token: !!access_token,
-        refresh_token: !!refresh_token,
-        hash: window.location.hash,
-        search: window.location.search,
-      });
-      setError(
-        'Invalid or expired reset link. Please request a new password reset.'
-      );
-      return;
-    }
+      setIsValidSession(true);
+      setIsCheckingSession(false);
+    };
 
-    setTokens({ access_token, refresh_token });
+    checkSession();
   }, []);
 
   const validateForm = () => {
@@ -86,8 +84,8 @@ function ResetPasswordContent() {
 
     if (!validateForm()) return;
 
-    if (!tokens.access_token || !tokens.refresh_token) {
-      setError('Invalid reset tokens. Please request a new password reset.');
+    if (!isValidSession) {
+      setError('Invalid session. Please request a new password reset.');
       return;
     }
 
@@ -95,22 +93,19 @@ function ResetPasswordContent() {
       setIsLoading(true);
       setError(null);
 
-      const response = await fetch('/api/auth/reset-password', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          password,
-          access_token: tokens.access_token,
-          refresh_token: tokens.refresh_token,
-        }),
+      const supabase = createClient();
+      if (!supabase) {
+        throw new Error(
+          'Failed to initialize authentication. Please try again.'
+        );
+      }
+
+      const { error } = await supabase.auth.updateUser({
+        password: password,
       });
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to reset password');
+      if (error) {
+        throw new Error(error.message || 'Failed to reset password');
       }
 
       setIsSuccess(true);
@@ -121,6 +116,21 @@ function ResetPasswordContent() {
       setIsLoading(false);
     }
   };
+
+  if (isCheckingSession) {
+    return (
+      <div className="w-full max-w-md space-y-6">
+        <div className="text-center">
+          <h1 className="text-foreground text-3xl font-medium tracking-tight sm:text-4xl">
+            Verifying Reset Link...
+          </h1>
+          <p className="text-muted-foreground mt-3">
+            Please wait while we verify your reset link
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   if (isSuccess) {
     return (
@@ -260,7 +270,7 @@ function ResetPasswordContent() {
           type="submit"
           className="w-full"
           size="lg"
-          disabled={isLoading || !tokens.access_token}
+          disabled={isLoading || !isValidSession}
         >
           {isLoading ? 'Updating...' : 'Update Password'}
         </Button>
