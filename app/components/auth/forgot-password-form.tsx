@@ -1,62 +1,67 @@
-"use client"
+'use client';
 
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { ArrowLeft } from "@phosphor-icons/react"
-import { useState } from "react"
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { ArrowLeft } from '@phosphor-icons/react';
+import { useState } from 'react';
 
 type ForgotPasswordFormProps = {
-  onBack: () => void
-  onSuccess?: () => void
-}
+  onBack: () => void;
+  onSuccess?: () => void;
+};
 
-export function ForgotPasswordForm({ onBack, onSuccess }: ForgotPasswordFormProps) {
-  const [email, setEmail] = useState("")
-  const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const [isSuccess, setIsSuccess] = useState(false)
+export function ForgotPasswordForm({
+  onBack,
+  onSuccess,
+}: ForgotPasswordFormProps) {
+  const [email, setEmail] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [isSuccess, setIsSuccess] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    
+    e.preventDefault();
+
     if (!email) {
-      setError("Email is required")
-      return
+      setError('Email is required');
+      return;
     }
 
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      setError("Please enter a valid email address")
-      return
+      setError('Please enter a valid email address');
+      return;
     }
 
     try {
-      setIsLoading(true)
-      setError(null)
+      setIsLoading(true);
+      setError(null);
 
-      const response = await fetch("/api/auth/forgot-password", {
-        method: "POST",
+      const response = await fetch('/api/auth/forgot-password', {
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify({ email }),
-      })
+      });
 
-      const data = await response.json()
+      const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || "Failed to send reset email")
+        throw new Error(data.error || 'Failed to send reset email');
       }
 
-      setIsSuccess(true)
-      onSuccess?.()
+      setIsSuccess(true);
+      // Only call onSuccess if it's provided (for regular auth flow)
+      // For forgot password, we want to stay on the success page
+      onSuccess?.();
     } catch (err: unknown) {
-      console.error("Forgot password error:", err)
-      setError((err as Error).message || "An unexpected error occurred")
+      console.error('Forgot password error:', err);
+      setError((err as Error).message || 'An unexpected error occurred');
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   if (isSuccess) {
     return (
@@ -73,7 +78,8 @@ export function ForgotPasswordForm({ onBack, onSuccess }: ForgotPasswordFormProp
         <div className="space-y-4">
           <div className="rounded-md bg-green-500/10 p-4">
             <p className="text-green-400">
-              Password reset email sent! Check your inbox for further instructions.
+              Password reset email sent! Check your inbox for further
+              instructions.
             </p>
           </div>
           <Button
@@ -86,15 +92,15 @@ export function ForgotPasswordForm({ onBack, onSuccess }: ForgotPasswordFormProp
             <ArrowLeft className="mr-2 h-4 w-4" />
             Back to sign in
           </Button>
-          
+
           <div className="text-center">
             <button
               type="button"
               className="text-muted-foreground hover:text-foreground text-sm transition-colors"
               onClick={() => {
-                setIsSuccess(false)
-                setEmail("")
-                setError(null)
+                setIsSuccess(false);
+                setEmail('');
+                setError(null);
               }}
             >
               Didn't receive the email? Try again
@@ -102,7 +108,7 @@ export function ForgotPasswordForm({ onBack, onSuccess }: ForgotPasswordFormProp
           </div>
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -112,7 +118,8 @@ export function ForgotPasswordForm({ onBack, onSuccess }: ForgotPasswordFormProp
           Reset Password
         </h1>
         <p className="text-muted-foreground mt-3">
-          Enter your email address and we'll send you a link to reset your password
+          Enter your email address and we'll send you a link to reset your
+          password
         </p>
       </div>
 
@@ -155,10 +162,10 @@ export function ForgotPasswordForm({ onBack, onSuccess }: ForgotPasswordFormProp
             size="lg"
             disabled={isLoading || !email.trim()}
           >
-            {isLoading ? "Sending..." : "Send reset link"}
+            {isLoading ? 'Sending...' : 'Send reset link'}
           </Button>
         </div>
       </form>
     </div>
-  )
+  );
 }

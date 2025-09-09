@@ -38,6 +38,7 @@ import { toast } from 'sonner';
 import { useUser } from '@/lib/user-store/provider';
 import { LoginPrompt } from '@/app/components/auth/login-prompt';
 import { useCategories } from '@/lib/categories-store/provider';
+import { useRouter } from 'next/navigation';
 
 interface DialogExternalAIToolProps {
   open: boolean;
@@ -50,6 +51,7 @@ export function DialogExternalAITool({
   onOpenChange,
   tool,
 }: DialogExternalAIToolProps) {
+  const router = useRouter();
   const { createTool, updateTool } = useExternalAITools();
   const { user } = useUser();
   const { categories, isLoading: categoriesLoading } = useCategories();
@@ -72,6 +74,17 @@ export function DialogExternalAITool({
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const isEditing = !!tool;
+
+  // Redirect to auth page if dialog is opened and user is not authenticated
+  useEffect(() => {
+    if (open && !user) {
+      const returnUrl = encodeURIComponent(
+        window.location.pathname + window.location.search
+      );
+      router.push(`/auth?returnUrl=${returnUrl}`);
+      onOpenChange(false);
+    }
+  }, [open, user, router, onOpenChange]);
 
   useEffect(() => {
     if (tool) {
@@ -283,31 +296,9 @@ export function DialogExternalAITool({
     }
   };
 
-  // Show login prompt if user is not authenticated
+  // If user is not authenticated, don't render anything (redirect will happen in useEffect)
   if (!user) {
-    return (
-      <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="max-h-[90vh] w-full max-w-md overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <Wrench className="h-5 w-5" />
-              Add External AI Tool
-            </DialogTitle>
-            <DialogDescription>
-              Sign in to add and manage external AI tools.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="py-4">
-            <LoginPrompt
-              title="Login to Add External AI Tools"
-              description="You need to be logged in to add and manage external AI tools. Sign in to get started."
-              actionText="Sign In to Continue"
-              className="border-0 shadow-none"
-            />
-          </div>
-        </DialogContent>
-      </Dialog>
-    );
+    return null;
   }
 
   const FooterContent = () => (

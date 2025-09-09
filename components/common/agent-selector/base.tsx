@@ -37,15 +37,18 @@ import { useCategories } from '@/lib/categories-store/provider';
 import { Agent } from '@/lib/agent-store/types';
 import { cn } from '@/lib/utils';
 import {
+  ArrowRight,
   CaretDownIcon,
   ClockIcon,
   MagnifyingGlassIcon,
   PlusIcon,
   RobotIcon,
+  Storefront,
   TrashIcon,
   UserIcon,
 } from '@phosphor-icons/react';
 import { useRef, useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 import { SubMenu } from './sub-menu';
 
@@ -62,6 +65,7 @@ export function AgentSelector({
   className,
   isUserAuthenticated = true,
 }: AgentSelectorProps) {
+  const router = useRouter();
   const {
     agents,
     isLoading: isLoadingAgents,
@@ -69,6 +73,7 @@ export function AgentSelector({
     historyAgents,
     addToHistory,
     clearHistory,
+    publicAgentCount,
   } = useAgents();
   const { categories } = useCategories();
   const isMobile = useBreakpoint(768);
@@ -205,7 +210,7 @@ export function AgentSelector({
         }}
       >
         <div className="flex items-center gap-3">
-          <UserIcon className="size-5" />
+          <RobotIcon className="size-5" />
           <div className="flex flex-col gap-0">
             <span className="text-sm font-medium">Default Assistant</span>
             <span className="text-muted-foreground text-xs">
@@ -239,7 +244,7 @@ export function AgentSelector({
           </>
         ) : (
           <>
-            <UserIcon className="size-5 flex-shrink-0" />
+            <RobotIcon className="size-5 flex-shrink-0" />
             <span className="truncate text-sm">Default</span>
           </>
         )}
@@ -263,7 +268,8 @@ export function AgentSelector({
             <DrawerTitle>Select Agent</DrawerTitle>
           </DrawerHeader>
           <div className="px-4 pb-2 space-y-2">
-            <div className="relative">
+            {/* Search Bar - Hidden for now */}
+            {/* <div className="relative">
               <MagnifyingGlassIcon className="text-muted-foreground absolute top-2.5 left-2.5 h-4 w-4" />
               <Input
                 ref={searchInputRef}
@@ -273,9 +279,9 @@ export function AgentSelector({
                 onChange={handleSearchChange}
                 onClick={(e) => e.stopPropagation()}
               />
-            </div>
-            {/* Category Filter */}
-            <Select
+            </div> */}
+            {/* Category Filter - Hidden for now */}
+            {/* <Select
               value={selectedCategoryId}
               onValueChange={setSelectedCategoryId}
             >
@@ -295,7 +301,34 @@ export function AgentSelector({
                   </SelectItem>
                 ))}
               </SelectContent>
-            </Select>
+            </Select> */}
+
+            {/* Visit Store Button - Standardized UI */}
+            <div
+              className="hover:bg-accent/50 flex w-full cursor-pointer items-center justify-between px-3 py-2"
+              onClick={() => {
+                router.push('/store');
+                setIsDrawerOpen(false);
+              }}
+            >
+              <div className="flex items-center justify-between w-full">
+                <div className="flex items-center gap-3">
+                  <Storefront className="size-5" />
+                  <div className="flex flex-col gap-0">
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-medium">Browse Store</span>
+                      <span className="bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 text-xs px-1.5 py-0.5 rounded-full font-medium">
+                        {publicAgentCount}
+                      </span>
+                    </div>
+                    <span className="text-muted-foreground text-xs">
+                      Browse and discover more agents
+                    </span>
+                  </div>
+                </div>
+                <ArrowRight className="size-4 text-muted-foreground" />
+              </div>
+            </div>
           </div>
           <div className="flex h-full flex-col space-y-0 overflow-y-auto px-4 pb-6">
             {isLoadingAgents ? (
@@ -360,27 +393,6 @@ export function AgentSelector({
                     </p>
                   </div>
                 )}
-                {/* Action Buttons */}
-                <div className="mt-2 space-y-2 border-t pt-4">
-                  {/* Create New Agent Option */}
-                  <div
-                    className="hover:bg-accent/50 flex w-full cursor-pointer items-center gap-3 px-3 py-2 text-blue-600 hover:text-blue-700"
-                    onClick={() => {
-                      setIsCreateDialogOpen(true);
-                      setIsDrawerOpen(false);
-                    }}
-                  >
-                    <PlusIcon className="size-5" />
-                    <div className="flex flex-col gap-0">
-                      <span className="text-sm font-medium">
-                        Create New Agent
-                      </span>
-                      <span className="text-muted-foreground text-xs">
-                        Build a custom AI assistant
-                      </span>
-                    </div>
-                  </div>
-                </div>
               </>
             )}
           </div>
@@ -418,7 +430,8 @@ export function AgentSelector({
           >
             <div className="bg-background sticky top-0 z-10 rounded-t-md border-b px-0 pt-0 pb-0">
               <div className="space-y-2 p-2">
-                <div className="relative">
+                {/* Search Bar - Hidden for now */}
+                {/* <div className="relative">
                   <MagnifyingGlassIcon className="text-muted-foreground absolute top-2.5 left-2.5 h-4 w-4" />
                   <Input
                     ref={searchInputRef}
@@ -430,9 +443,9 @@ export function AgentSelector({
                     onFocus={(e) => e.stopPropagation()}
                     onKeyDown={(e) => e.stopPropagation()}
                   />
-                </div>
-                {/* Category Filter */}
-                <Select
+                </div> */}
+                {/* Category Filter - Hidden for now */}
+                {/* <Select
                   value={selectedCategoryId}
                   onValueChange={setSelectedCategoryId}
                 >
@@ -452,7 +465,46 @@ export function AgentSelector({
                       </SelectItem>
                     ))}
                   </SelectContent>
-                </Select>
+                </Select> */}
+
+                {/* Visit Store Button - Standardized UI */}
+                <DropdownMenuItem
+                  className="flex w-full items-center justify-between px-3 py-2"
+                  onSelect={() => {
+                    router.push('/store');
+                    setIsDropdownOpen(false);
+                  }}
+                  onFocus={() => {
+                    if (isDropdownOpen) {
+                      setHoveredAgent('store');
+                    }
+                  }}
+                  onMouseEnter={() => {
+                    if (isDropdownOpen) {
+                      setHoveredAgent('store');
+                    }
+                  }}
+                >
+                  <div className="flex items-center justify-between w-full">
+                    <div className="flex items-center gap-3">
+                      <Storefront className="size-5" />
+                      <div className="flex flex-col gap-0">
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm font-medium">
+                            Browse Store
+                          </span>
+                          <span className="bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 text-xs px-1.5 py-0.5 rounded-full font-medium">
+                            {publicAgentCount}
+                          </span>
+                        </div>
+                        <span className="text-muted-foreground text-xs">
+                          Browse and discover more agents
+                        </span>
+                      </div>
+                    </div>
+                    <ArrowRight className="size-4 text-muted-foreground" />
+                  </div>
+                </DropdownMenuItem>
               </div>
             </div>
             <div className="flex h-full flex-col space-y-0 overflow-y-auto px-1 pt-0 pb-0">
@@ -485,7 +537,7 @@ export function AgentSelector({
                     }}
                   >
                     <div className="flex items-center gap-3">
-                      <UserIcon className="size-5" />
+                      <RobotIcon className="size-5" />
                       <div className="flex flex-col gap-0">
                         <span className="text-sm font-medium">
                           Default Assistant
@@ -633,30 +685,6 @@ export function AgentSelector({
                       </p>
                     </div>
                   )}
-
-                  {/* Action Buttons */}
-                  <div className="px-3 py-1">
-                    <div className="border-border border-t" />
-                  </div>
-
-                  {/* Create Agent Button */}
-                  <DropdownMenuItem
-                    className="flex w-full items-center gap-3 px-3 py-2 text-blue-600 hover:text-blue-700"
-                    onSelect={() => {
-                      setIsCreateDialogOpen(true);
-                      setIsDropdownOpen(false);
-                    }}
-                  >
-                    <PlusIcon className="size-5" />
-                    <div className="flex flex-col gap-0">
-                      <span className="text-sm font-medium">
-                        Create New Agent
-                      </span>
-                      <span className="text-muted-foreground text-xs">
-                        Build a custom AI assistant
-                      </span>
-                    </div>
-                  </DropdownMenuItem>
                 </>
               )}
             </div>

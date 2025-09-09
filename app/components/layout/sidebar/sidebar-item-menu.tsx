@@ -1,41 +1,48 @@
-import { useBreakpoint } from "@/app/hooks/use-breakpoint"
+import { useBreakpoint } from '@/app/hooks/use-breakpoint';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { useChats } from "@/lib/chat-store/chats/provider"
-import { useMessages } from "@/lib/chat-store/messages/provider"
-import { useChatSession } from "@/lib/chat-store/session/provider"
-import { Chat } from "@/lib/chat-store/types"
-import { DotsThree, PencilSimple, Trash } from "@phosphor-icons/react"
-import { useRouter } from "next/navigation"
-import { useState } from "react"
-import { DialogDeleteChat } from "./dialog-delete-chat"
+} from '@/components/ui/dropdown-menu';
+import { useSidebar } from '@/components/ui/sidebar';
+import { useChats } from '@/lib/chat-store/chats/provider';
+import { useMessages } from '@/lib/chat-store/messages/provider';
+import { useChatSession } from '@/lib/chat-store/session/provider';
+import { Chat } from '@/lib/chat-store/types';
+import { DotsThree, PencilSimple, Trash } from '@phosphor-icons/react';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
+import { DialogDeleteChat } from './dialog-delete-chat';
 
 type SidebarItemMenuProps = {
-  chat: Chat
-  onStartEditing: () => void
-  onMenuOpenChange?: (open: boolean) => void
-}
+  chat: Chat;
+  onStartEditing: () => void;
+  onMenuOpenChange?: (open: boolean) => void;
+};
 
 export function SidebarItemMenu({
   chat,
   onStartEditing,
   onMenuOpenChange,
 }: SidebarItemMenuProps) {
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
-  const router = useRouter()
-  const { deleteMessages } = useMessages()
-  const { deleteChat } = useChats()
-  const { chatId } = useChatSession()
-  const isMobile = useBreakpoint(768)
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const router = useRouter();
+  const { deleteMessages } = useMessages();
+  const { deleteChat } = useChats();
+  const { chatId } = useChatSession();
+  const isMobile = useBreakpoint(768);
+  const { setOpenMobile } = useSidebar();
 
   const handleConfirmDelete = async () => {
-    await deleteMessages()
-    await deleteChat(chat.id, chatId!, () => router.push("/"))
-  }
+    await deleteMessages();
+    await deleteChat(chat.id, chatId!, () => {
+      router.push('/');
+      if (isMobile) {
+        setOpenMobile(false);
+      }
+    });
+  };
 
   return (
     <>
@@ -56,9 +63,9 @@ export function SidebarItemMenu({
           <DropdownMenuItem
             className="cursor-pointer"
             onClick={(e) => {
-              e.preventDefault()
-              e.stopPropagation()
-              onStartEditing()
+              e.preventDefault();
+              e.stopPropagation();
+              onStartEditing();
             }}
           >
             <PencilSimple size={16} className="mr-2" />
@@ -68,9 +75,9 @@ export function SidebarItemMenu({
             className="text-destructive"
             variant="destructive"
             onClick={(e) => {
-              e.preventDefault()
-              e.stopPropagation()
-              setIsDeleteDialogOpen(true)
+              e.preventDefault();
+              e.stopPropagation();
+              setIsDeleteDialogOpen(true);
             }}
           >
             <Trash size={16} className="mr-2" />
@@ -82,9 +89,9 @@ export function SidebarItemMenu({
       <DialogDeleteChat
         isOpen={isDeleteDialogOpen}
         setIsOpen={setIsDeleteDialogOpen}
-        chatTitle={chat.title || "Untitled chat"}
+        chatTitle={chat.title || 'Untitled chat'}
         onConfirmDelete={handleConfirmDelete}
       />
     </>
-  )
+  );
 }

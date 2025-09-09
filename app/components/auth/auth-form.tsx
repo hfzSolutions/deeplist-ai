@@ -87,6 +87,14 @@ export function AuthForm({ onSuccess }: AuthFormProps) {
         await signInWithEmail(supabase, formData.email, formData.password);
       }
 
+      // For signup, switch to login form instead of redirecting
+      if (isSignUp) {
+        setIsSignUp(false);
+        setFormData({ email: '', password: '', confirmPassword: '' });
+        setError(null);
+        return;
+      }
+
       onSuccess?.();
     } catch (err: unknown) {
       console.error('Error with email authentication:', err);
@@ -125,6 +133,8 @@ export function AuthForm({ onSuccess }: AuthFormProps) {
 
       const data = await signInWithGoogle(supabase);
       if (data?.url) {
+        // For Google auth, we redirect to the OAuth provider
+        // The callback will handle the redirect back to the original page
         window.location.href = data.url;
       }
     } catch (err: unknown) {
@@ -143,7 +153,7 @@ export function AuthForm({ onSuccess }: AuthFormProps) {
     return (
       <ForgotPasswordForm
         onBack={() => setShowForgotPassword(false)}
-        onSuccess={onSuccess}
+        // Don't pass onSuccess - we want users to stay on the forgot password success page
       />
     );
   }
