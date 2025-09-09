@@ -18,47 +18,9 @@ function ResetPasswordContent() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isSuccess, setIsSuccess] = useState(false);
-  const [isValidSession, setIsValidSession] = useState(false);
-  const [isCheckingSession, setIsCheckingSession] = useState(true);
+  const [isReady, setIsReady] = useState(true);
 
-  useEffect(() => {
-    // Check if user is authenticated (Supabase handles this automatically after reset link click)
-    const checkSession = async () => {
-      const supabase = createClient();
-      if (!supabase) {
-        setError('Failed to initialize authentication. Please try again.');
-        setIsCheckingSession(false);
-        return;
-      }
-
-      const {
-        data: { session },
-        error,
-      } = await supabase.auth.getSession();
-
-      if (error) {
-        console.error('Session check error:', error);
-        setError(
-          'Invalid or expired reset link. Please request a new password reset.'
-        );
-        setIsCheckingSession(false);
-        return;
-      }
-
-      if (!session) {
-        setError(
-          'Invalid or expired reset link. Please request a new password reset.'
-        );
-        setIsCheckingSession(false);
-        return;
-      }
-
-      setIsValidSession(true);
-      setIsCheckingSession(false);
-    };
-
-    checkSession();
-  }, []);
+  // No session check needed - Supabase handles authentication automatically
 
   const validateForm = () => {
     if (!password) {
@@ -84,10 +46,7 @@ function ResetPasswordContent() {
 
     if (!validateForm()) return;
 
-    if (!isValidSession) {
-      setError('Invalid session. Please request a new password reset.');
-      return;
-    }
+    // No session validation needed - Supabase handles it automatically
 
     try {
       setIsLoading(true);
@@ -117,20 +76,7 @@ function ResetPasswordContent() {
     }
   };
 
-  if (isCheckingSession) {
-    return (
-      <div className="w-full max-w-md space-y-6">
-        <div className="text-center">
-          <h1 className="text-foreground text-3xl font-medium tracking-tight sm:text-4xl">
-            Verifying Reset Link...
-          </h1>
-          <p className="text-muted-foreground mt-3">
-            Please wait while we verify your reset link
-          </p>
-        </div>
-      </div>
-    );
-  }
+  // No loading state needed - Supabase handles everything automatically
 
   if (isSuccess) {
     return (
@@ -158,10 +104,8 @@ function ResetPasswordContent() {
           className="w-full"
           size="lg"
           onClick={() => {
-            const returnUrl = encodeURIComponent(
-              window.location.pathname + window.location.search
-            );
-            router.push(`/auth?returnUrl=${returnUrl}`);
+            // Don't pass returnUrl - after password reset, user should go to home page
+            router.push('/auth');
           }}
         >
           Continue to Sign In
@@ -266,12 +210,7 @@ function ResetPasswordContent() {
           </div>
         </div>
 
-        <Button
-          type="submit"
-          className="w-full"
-          size="lg"
-          disabled={isLoading || !isValidSession}
-        >
+        <Button type="submit" className="w-full" size="lg" disabled={isLoading}>
           {isLoading ? 'Updating...' : 'Update Password'}
         </Button>
       </form>
