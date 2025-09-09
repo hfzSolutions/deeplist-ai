@@ -71,6 +71,7 @@ export function ExternalAITools({ toolId }: ExternalAIToolsProps) {
   const [shareTool, setShareTool] = useState<ExternalAITool | null>(null);
   const [showLoginPrompt, setShowLoginPrompt] = useState(false);
   const [loginPromptAction, setLoginPromptAction] = useState('');
+  const [toolRedirectProcessed, setToolRedirectProcessed] = useState(false);
 
   useEffect(() => {
     fetchTools({
@@ -79,10 +80,15 @@ export function ExternalAITools({ toolId }: ExternalAIToolsProps) {
     });
   }, [fetchTools, searchQuery]);
 
+  // Reset tool redirect processing when toolId changes
+  useEffect(() => {
+    setToolRedirectProcessed(false);
+  }, [toolId]);
+
   // Handle automatic tool details dialog opening when toolId is provided
   useEffect(() => {
     const handleToolRedirect = async () => {
-      if (!toolId) return;
+      if (!toolId || toolRedirectProcessed) return;
 
       // First try to find the tool in the current tools list
       let tool = tools.find((t) => t.id === toolId);
@@ -103,6 +109,7 @@ export function ExternalAITools({ toolId }: ExternalAIToolsProps) {
               'AI tool not found. The link may be outdated or the tool may have been removed.'
             );
             errorHandled = true;
+            setToolRedirectProcessed(true);
             const url = new URL(window.location.href);
             url.searchParams.delete('tool');
             window.history.replaceState({}, '', url.toString());
@@ -113,6 +120,7 @@ export function ExternalAITools({ toolId }: ExternalAIToolsProps) {
               'Failed to load AI tool details. Please try again later.'
             );
             errorHandled = true;
+            setToolRedirectProcessed(true);
             const url = new URL(window.location.href);
             url.searchParams.delete('tool');
             window.history.replaceState({}, '', url.toString());
@@ -124,6 +132,7 @@ export function ExternalAITools({ toolId }: ExternalAIToolsProps) {
             'Failed to load AI tool details. Please check your connection and try again.'
           );
           errorHandled = true;
+          setToolRedirectProcessed(true);
           const url = new URL(window.location.href);
           url.searchParams.delete('tool');
           window.history.replaceState({}, '', url.toString());
@@ -134,6 +143,7 @@ export function ExternalAITools({ toolId }: ExternalAIToolsProps) {
       if (tool) {
         setSelectedTool(tool);
         setDetailsDialogOpen(true);
+        setToolRedirectProcessed(true);
         // Clear the URL parameter after opening the dialog
         const url = new URL(window.location.href);
         url.searchParams.delete('tool');
@@ -143,6 +153,7 @@ export function ExternalAITools({ toolId }: ExternalAIToolsProps) {
         toast.error(
           'AI tool not found. The link may be outdated or the tool may have been removed.'
         );
+        setToolRedirectProcessed(true);
         const url = new URL(window.location.href);
         url.searchParams.delete('tool');
         window.history.replaceState({}, '', url.toString());
@@ -150,7 +161,7 @@ export function ExternalAITools({ toolId }: ExternalAIToolsProps) {
     };
 
     handleToolRedirect();
-  }, [toolId, tools, isLoading]);
+  }, [toolId, tools, isLoading, toolRedirectProcessed]);
 
   const handleVisitTool = (website: string) => {
     window.open(website, '_blank', 'noopener,noreferrer');

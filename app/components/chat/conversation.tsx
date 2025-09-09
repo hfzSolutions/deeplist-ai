@@ -1,32 +1,32 @@
 import {
   ChatContainerContent,
   ChatContainerRoot,
-} from "@/components/prompt-kit/chat-container"
-import { Loader } from "@/components/prompt-kit/loader"
-import { ScrollButton } from "@/components/prompt-kit/scroll-button"
-import { Message as MessageType } from "@ai-sdk/react"
-import { useRef } from "react"
-import { Message } from "./message"
+} from '@/components/prompt-kit/chat-container';
+import { Loader } from '@/components/prompt-kit/loader';
+import { ScrollButton } from '@/components/prompt-kit/scroll-button';
+import { Message as MessageType } from '@ai-sdk/react';
+import { useRef } from 'react';
+import { Message } from './message';
 
 type ConversationProps = {
-  messages: MessageType[]
-  status?: "streaming" | "ready" | "submitted" | "error"
-  onDelete: (id: string) => void
-  onEdit: (id: string, newText: string) => void
-  onReload: () => void
-}
+  messages: MessageType[];
+  status?: 'streaming' | 'ready' | 'submitted' | 'error';
+  onDelete: (id: string) => void;
+  onEdit: (id: string, newText: string) => void;
+  onReload: () => void;
+};
 
 export function Conversation({
   messages,
-  status = "ready",
+  status = 'ready',
   onDelete,
   onEdit,
   onReload,
 }: ConversationProps) {
-  const initialMessageCount = useRef(messages.length)
+  const initialMessageCount = useRef(messages.length);
 
   if (!messages || messages.length === 0)
-    return <div className="h-full w-full"></div>
+    return <div className="h-full w-full"></div>;
 
   return (
     <div className="relative flex h-full w-full flex-col items-center overflow-x-hidden overflow-y-auto">
@@ -38,15 +38,15 @@ export function Conversation({
         <ChatContainerContent
           className="flex w-full flex-col items-center pt-20 pb-4"
           style={{
-            scrollbarGutter: "stable both-edges",
-            scrollbarWidth: "none",
+            scrollbarGutter: 'stable both-edges',
+            scrollbarWidth: 'none',
           }}
         >
           {messages?.map((message, index) => {
             const isLast =
-              index === messages.length - 1 && status !== "submitted"
+              index === messages.length - 1 && status !== 'submitted';
             const hasScrollAnchor =
-              isLast && messages.length > initialMessageCount.current
+              isLast && messages.length > initialMessageCount.current;
 
             return (
               <Message
@@ -66,11 +66,11 @@ export function Conversation({
               >
                 {message.content}
               </Message>
-            )
+            );
           })}
-          {status === "submitted" &&
+          {status === 'submitted' &&
             messages.length > 0 &&
-            messages[messages.length - 1].role === "user" && (
+            messages[messages.length - 1].role === 'user' && (
               <div className="group min-h-scroll-anchor flex w-full max-w-3xl flex-col items-start gap-2 px-6 pb-2">
                 <Loader />
               </div>
@@ -81,5 +81,5 @@ export function Conversation({
         </ChatContainerContent>
       </ChatContainerRoot>
     </div>
-  )
+  );
 }

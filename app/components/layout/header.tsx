@@ -27,24 +27,24 @@ export function Header({ hasSidebar }: { hasSidebar: boolean }) {
   const isOnStorePage = pathname === '/';
 
   return (
-    <header className="h-app-header pointer-events-none fixed top-0 right-0 left-0 z-50">
-      <div className="relative mx-auto flex h-full max-w-full items-center justify-between bg-transparent px-4 sm:px-6 lg:bg-transparent lg:px-8">
-        <div className="flex flex-1 items-center justify-between">
-          <div className="-ml-0.5 flex flex-1 items-center gap-2 lg:-ml-2.5">
-            <div className="flex flex-1 items-center gap-2">
+    <header className="h-app-header pointer-events-none fixed top-0 right-0 left-0 z-[9999]">
+      <div className="relative mx-auto flex h-full max-w-full items-center justify-between bg-transparent px-2 sm:px-4 md:px-6 lg:bg-transparent lg:px-8">
+        <div className="flex flex-1 items-center justify-between min-w-0">
+          <div className="flex flex-1 items-center gap-1 sm:gap-2 lg:-ml-2.5">
+            <div className="flex flex-1 items-center gap-1 sm:gap-2 min-w-0">
               <Link
                 href="/"
-                className="pointer-events-auto inline-flex items-center text-xl font-medium tracking-tight"
+                className="pointer-events-auto inline-flex items-center text-lg font-medium tracking-tight sm:text-xl min-w-0"
               >
-                <DeeplistAIIcon className="mr-1 size-6" />
-                {APP_NAME}
+                <DeeplistAIIcon className="mr-1 size-5 sm:size-6 flex-shrink-0" />
+                <span className="truncate">{APP_NAME}</span>
               </Link>
               {hasSidebar && isMobile && <HeaderSidebarTrigger />}
             </div>
           </div>
-          <div />
+          <div className="flex-shrink-0" />
           {!isLoggedIn ? (
-            <div className="pointer-events-auto flex flex-1 items-center justify-end gap-4">
+            <div className="pointer-events-auto flex flex-1 items-center justify-end gap-2 sm:gap-4">
               {/* <AppInfoTrigger
                 trigger={
                   <Button
@@ -66,7 +66,7 @@ export function Header({ hasSidebar }: { hasSidebar: boolean }) {
               </Link> */}
             </div>
           ) : (
-            <div className="pointer-events-auto flex flex-1 items-center justify-end gap-2">
+            <div className="pointer-events-auto flex flex-1 items-center justify-end gap-1 sm:gap-2">
               {!isMultiModelEnabled && <DialogPublish />}
               {!isOnStorePage && <ButtonStore />}
               <ButtonNewChat />

@@ -117,11 +117,7 @@ export function AppSidebar() {
               className="hover:bg-accent/80 hover:text-foreground group/agent-store relative inline-flex w-full items-center rounded-md bg-transparent px-2 py-2 text-sm transition-colors border border-primary/20 hover:border-primary/40"
               type="button"
               onClick={() => {
-                const currentChatUrl = pathname.startsWith('/c/')
-                  ? pathname
-                  : undefined;
-                router.push('/');
-                forceAgentStoreView(currentChatUrl);
+                router.push('/store');
               }}
             >
               <div className="flex items-center gap-2">

@@ -2,7 +2,6 @@
 
 import { Header } from '@/app/components/layout/header';
 import { AppSidebar } from '@/app/components/layout/sidebar/app-sidebar';
-import { AnnouncementBanner } from '@/app/components/transition';
 import { useUserPreferences } from '@/lib/user-preference-store/provider';
 
 export function LayoutApp({ children }: { children: React.ReactNode }) {
@@ -13,7 +12,6 @@ export function LayoutApp({ children }: { children: React.ReactNode }) {
     <div className="bg-background flex h-dvh w-full overflow-hidden">
       {hasSidebar && <AppSidebar />}
       <main className="@container relative h-dvh w-0 flex-shrink flex-grow overflow-y-auto">
-        <AnnouncementBanner />
         <Header hasSidebar={hasSidebar} />
         {children}
       </main>

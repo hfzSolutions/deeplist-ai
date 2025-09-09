@@ -1,130 +1,144 @@
-"use client"
+'use client';
 
-import { toast } from "@/components/ui/toast"
-import { useChatSession } from "@/lib/chat-store/session/provider"
-import type { Message as MessageAISDK } from "ai"
-import { createContext, useContext, useEffect, useState } from "react"
-import { writeToIndexedDB } from "../persist"
+import { toast } from '@/components/ui/toast';
+import { useChatSession } from '@/lib/chat-store/session/provider';
+import type { Message as MessageAISDK } from 'ai';
+import { createContext, useContext, useEffect, useState } from 'react';
+import { writeToIndexedDB } from '../persist';
 import {
   cacheMessages,
   clearMessagesForChat,
   getCachedMessages,
   getMessagesFromDb,
   setMessages as saveMessages,
-} from "./api"
+} from './api';
 
 interface MessagesContextType {
-  messages: MessageAISDK[]
-  isLoading: boolean
-  setMessages: React.Dispatch<React.SetStateAction<MessageAISDK[]>>
-  refresh: () => Promise<void>
-  saveAllMessages: (messages: MessageAISDK[]) => Promise<void>
-  cacheAndAddMessage: (message: MessageAISDK) => Promise<void>
-  resetMessages: () => Promise<void>
-  deleteMessages: () => Promise<void>
+  messages: MessageAISDK[];
+  isLoading: boolean;
+  setMessages: React.Dispatch<React.SetStateAction<MessageAISDK[]>>;
+  refresh: () => Promise<void>;
+  saveAllMessages: (messages: MessageAISDK[]) => Promise<void>;
+  cacheAndAddMessage: (message: MessageAISDK) => Promise<void>;
+  resetMessages: () => Promise<void>;
+  deleteMessages: () => Promise<void>;
 }
 
-const MessagesContext = createContext<MessagesContextType | null>(null)
+const MessagesContext = createContext<MessagesContextType | null>(null);
 
 export function useMessages() {
-  const context = useContext(MessagesContext)
+  const context = useContext(MessagesContext);
   if (!context)
-    throw new Error("useMessages must be used within MessagesProvider")
-  return context
+    throw new Error('useMessages must be used within MessagesProvider');
+  return context;
 }
 
 export function MessagesProvider({ children }: { children: React.ReactNode }) {
-  const [messages, setMessages] = useState<MessageAISDK[]>([])
-  const [isLoading, setIsLoading] = useState(true)
-  const { chatId } = useChatSession()
+  const [messages, setMessages] = useState<MessageAISDK[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const { chatId } = useChatSession();
 
   useEffect(() => {
     if (chatId === null) {
-      setMessages([])
-      setIsLoading(false)
+      setMessages([]);
+      setIsLoading(false);
+      return;
     }
-  }, [chatId])
 
-  useEffect(() => {
-    if (!chatId) return
+    let isCancelled = false;
 
     const load = async () => {
-      setIsLoading(true)
-      const cached = await getCachedMessages(chatId)
-      setMessages(cached)
+      setIsLoading(true);
 
       try {
-        const fresh = await getMessagesFromDb(chatId)
-        setMessages(fresh)
-        cacheMessages(chatId, fresh)
-      } catch (error) {
-        console.error("Failed to fetch messages:", error)
-      } finally {
-        setIsLoading(false)
-      }
-    }
+        // Load cached messages first for immediate display
+        const cached = await getCachedMessages(chatId);
+        if (!isCancelled) {
+          setMessages(cached);
+        }
 
-    load()
-  }, [chatId])
+        // Then fetch fresh data from database
+        const fresh = await getMessagesFromDb(chatId);
+        if (!isCancelled) {
+          setMessages(fresh);
+          cacheMessages(chatId, fresh);
+        }
+      } catch (error) {
+        if (!isCancelled) {
+          console.error('Failed to fetch messages:', error);
+        }
+      } finally {
+        if (!isCancelled) {
+          setIsLoading(false);
+        }
+      }
+    };
+
+    load();
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [chatId]);
 
   const refresh = async () => {
-    if (!chatId) return
+    if (!chatId) return;
 
     try {
-      const fresh = await getMessagesFromDb(chatId)
-      setMessages(fresh)
+      const fresh = await getMessagesFromDb(chatId);
+      setMessages(fresh);
     } catch {
-      toast({ title: "Failed to refresh messages", status: "error" })
+      toast({ title: 'Failed to refresh messages', status: 'error' });
     }
-  }
+  };
 
   const cacheAndAddMessage = async (message: MessageAISDK) => {
-    if (!chatId) return
+    if (!chatId) return;
 
     try {
       setMessages((prev) => {
-        const updated = [...prev, message]
-        writeToIndexedDB("messages", { id: chatId, messages: updated })
-        return updated
-      })
+        const updated = [...prev, message];
+        writeToIndexedDB('messages', { id: chatId, messages: updated });
+        return updated;
+      });
     } catch {
-      toast({ title: "Failed to save message", status: "error" })
+      toast({ title: 'Failed to save message', status: 'error' });
     }
-  }
+  };
 
   const saveAllMessages = async (newMessages: MessageAISDK[]) => {
     // @todo: manage the case where the chatId is null (first time the user opens the chat)
-    if (!chatId) return
+    if (!chatId) return;
 
     try {
-      await saveMessages(chatId, newMessages)
-      setMessages(newMessages)
+      await saveMessages(chatId, newMessages);
+      setMessages(newMessages);
     } catch {
-      toast({ title: "Failed to save messages", status: "error" })
+      toast({ title: 'Failed to save messages', status: 'error' });
     }
-  }
+  };
 
   const deleteMessages = async () => {
-    if (!chatId) return
+    if (!chatId) return;
 
-    setMessages([])
-    await clearMessagesForChat(chatId)
-  }
+    setMessages([]);
+    await clearMessagesForChat(chatId);
+  };
 
   const resetMessages = async () => {
     try {
-      setMessages([])
+      setMessages([]);
       // Clear all cached messages from IndexedDB
       if (chatId) {
-        await writeToIndexedDB("messages", { id: chatId, messages: [] })
+        await writeToIndexedDB('messages', { id: chatId, messages: [] });
       }
-      console.log('Messages reset and cache cleared successfully')
+      console.log('Messages reset and cache cleared successfully');
     } catch (error) {
-      console.error('Error resetting messages:', error)
+      console.error('Error resetting messages:', error);
       // Still clear the state even if cache clearing fails
-      setMessages([])
+      setMessages([]);
     }
-  }
+  };
 
   return (
     <MessagesContext.Provider
@@ -141,5 +155,5 @@ export function MessagesProvider({ children }: { children: React.ReactNode }) {
     >
       {children}
     </MessagesContext.Provider>
-  )
+  );
 }

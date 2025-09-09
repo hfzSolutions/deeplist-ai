@@ -140,35 +140,35 @@ export function useChatCore({
 
   // Attach agent data to streaming assistant messages
   useEffect(() => {
-    if (selectedAgent && messages.length > 0) {
-      const lastMessage = messages[messages.length - 1];
-      if (
-        lastMessage.role === 'assistant' &&
-        status === 'streaming' &&
-        !(lastMessage as any).agent_id
-      ) {
-        setMessages((prev) => {
-          const updated = [...prev];
-          const lastIndex = updated.length - 1;
-          if (
-            updated[lastIndex].role === 'assistant' &&
-            !(updated[lastIndex] as any).agent_id
-          ) {
-            (updated[lastIndex] as any) = {
-              ...updated[lastIndex],
-              agent_id: selectedAgent.id,
-              agent: {
-                id: selectedAgent.id,
-                name: selectedAgent.name,
-                avatar_url: selectedAgent.avatar_url,
-              },
-            };
-          }
-          return updated;
-        });
-      }
+    if (!selectedAgent || messages.length === 0) return;
+
+    const lastMessage = messages[messages.length - 1];
+    if (
+      lastMessage.role === 'assistant' &&
+      status === 'streaming' &&
+      !(lastMessage as any).agent_id
+    ) {
+      setMessages((prev) => {
+        const updated = [...prev];
+        const lastIndex = updated.length - 1;
+        if (
+          updated[lastIndex].role === 'assistant' &&
+          !(updated[lastIndex] as any).agent_id
+        ) {
+          (updated[lastIndex] as any) = {
+            ...updated[lastIndex],
+            agent_id: selectedAgent.id,
+            agent: {
+              id: selectedAgent.id,
+              name: selectedAgent.name,
+              avatar_url: selectedAgent.avatar_url,
+            },
+          };
+        }
+        return updated;
+      });
     }
-  }, [messages, selectedAgent, status, setMessages]);
+  }, [selectedAgent, messages.length, status, setMessages]);
 
   // Reset messages when navigating from a chat to home
   if (
