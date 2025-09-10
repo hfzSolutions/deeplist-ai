@@ -13,6 +13,7 @@ import {
   MagnifyingGlass,
   Sparkle,
 } from '@phosphor-icons/react';
+import { cn } from '@/lib/utils';
 
 interface MigrationGuideModalProps {
   open: boolean;
@@ -46,7 +47,7 @@ export function MigrationGuideModal({
       <DialogContent className="sm:max-w-md max-h-[90vh] overflow-hidden flex flex-col">
         <DialogHeader className="flex-shrink-0">
           <DialogTitle className="flex items-center gap-2">
-            <Sparkle className="h-5 w-5 text-blue-600" />
+            <Sparkle className="h-5 w-5 text-primary" />
             What&apos;s New?
           </DialogTitle>
           <DialogDescription>
@@ -59,23 +60,23 @@ export function MigrationGuideModal({
             {features.map((feature, index) => (
               <div
                 key={index}
-                className="flex items-center gap-3 p-3 rounded-lg bg-gray-50"
+                className="flex items-center gap-3 p-3 rounded-lg bg-muted"
               >
-                <div className="flex-shrink-0 text-blue-600">
-                  {feature.icon}
-                </div>
+                <div className="flex-shrink-0 text-primary">{feature.icon}</div>
                 <div className="flex-1 min-w-0">
-                  <h5 className="text-sm font-medium text-gray-900">
+                  <h5 className="text-sm font-medium text-foreground">
                     {feature.title}
                   </h5>
-                  <p className="text-xs text-gray-600">{feature.description}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {feature.description}
+                  </p>
                 </div>
               </div>
             ))}
           </div>
         </div>
 
-        <div className="flex justify-end flex-shrink-0 pt-4 border-t">
+        <div className="flex justify-end flex-shrink-0 pt-4 border-t border-border">
           <Button onClick={() => onOpenChange(false)}>
             Got it, let&apos;s go!
           </Button>
