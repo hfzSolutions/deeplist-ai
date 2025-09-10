@@ -132,18 +132,6 @@ export function AgentsSection({
       )
     : savedAgents;
 
-  // Debug logging
-  console.log('Agents debug:', {
-    totalAgents: agents.length,
-    publicAgents: publicAgents.length,
-    userAgents: userAgents.length,
-    savedAgents: savedAgents.length,
-    filteredAgents: filteredAgents.length,
-    showMyAgentsOnly,
-    showSavedAgentsOnly,
-    pagination: pagination?.hasNext,
-  });
-
   // Handle search with debouncing
   const handleSearch = useCallback(
     async (query: string) => {

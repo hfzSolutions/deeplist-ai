@@ -366,7 +366,7 @@ export function DialogEditAgent({
           <div className="space-y-3">
             {avatarPreview ? (
               <div className="relative inline-block">
-                <div className="flex h-20 w-20 items-center justify-center overflow-hidden rounded-lg border-2 border-dashed border-gray-300 bg-gray-50">
+                <div className="flex h-20 w-20 items-center justify-center overflow-hidden rounded-lg border-2 border-dashed border-border bg-muted">
                   <img
                     src={avatarPreview}
                     alt="Avatar preview"
@@ -385,12 +385,12 @@ export function DialogEditAgent({
               </div>
             ) : (
               <div
-                className="flex h-20 w-20 cursor-pointer items-center justify-center rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 transition-colors hover:border-gray-400"
+                className="flex h-20 w-20 cursor-pointer items-center justify-center rounded-lg border-2 border-dashed border-border bg-muted transition-colors hover:border-muted-foreground/50"
                 onClick={() => fileInputRef.current?.click()}
               >
                 <div className="text-center">
-                  <Upload className="mx-auto mb-1 h-6 w-6 text-gray-400" />
-                  <p className="text-xs text-gray-500">Upload</p>
+                  <Upload className="mx-auto mb-1 h-6 w-6 text-muted-foreground" />
+                  <p className="text-xs text-muted-foreground">Upload</p>
                 </div>
               </div>
             )}
