@@ -100,7 +100,7 @@ export function MessageAssistant({
           </Avatar>
         )}
         <span className="text-muted-foreground text-sm font-medium">
-          {agentData ? agentData.name : 'Assistant'}
+          {agentData ? agentData.name : 'Agent'}
         </span>
       </div>
       <div className={cn('flex flex-col gap-2', isLast && 'pb-8')}>

@@ -18,19 +18,21 @@ export function ExternalAIToolsProvider({
 }) {
   const [tools, setTools] = useState<ExternalAITool[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [showMyToolsOnly, setShowMyToolsOnly] = useState(false);
 
-  const [pagination, setPagination] = useState({
-    page: 1,
-    limit: 20,
-    total: 0,
-    totalPages: 0,
-    hasNext: false,
-    hasPrev: false,
-  });
+  const [pagination, setPagination] = useState<{
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+    hasNext: boolean;
+    hasPrev: boolean;
+  } | null>(null);
 
-  const fetchTools = useCallback(async (params?: PaginationParams) => {
+  const refreshTools = useCallback(async (params?: PaginationParams) => {
     setIsLoading(true);
     setError(null);
 
@@ -40,7 +42,6 @@ export function ExternalAIToolsProvider({
       if (params?.page) searchParams.set('page', params.page.toString());
       if (params?.limit) searchParams.set('limit', params.limit.toString());
       if (params?.search) searchParams.set('search', params.search);
-
       if (params?.tags) searchParams.set('tags', params.tags);
 
       const response = await fetch(`/api/external-ai-tools?${searchParams}`);
@@ -51,12 +52,8 @@ export function ExternalAIToolsProvider({
 
       const data = await response.json();
 
-      if (params?.page === 1 || !params?.page) {
-        setTools(data.tools || []);
-      } else {
-        setTools((prev) => [...prev, ...(data.tools || [])]);
-      }
-
+      // Always replace tools for refresh (page 1 or no page specified)
+      setTools(data.tools || []);
       setPagination(
         data.pagination || {
           page: 1,
@@ -73,6 +70,14 @@ export function ExternalAIToolsProvider({
       setIsLoading(false);
     }
   }, []);
+
+  const fetchTools = useCallback(
+    async (params?: PaginationParams) => {
+      // For backward compatibility, use refreshTools
+      return refreshTools(params);
+    },
+    [refreshTools]
+  );
 
   const createTool = useCallback(
     async (
@@ -119,7 +124,9 @@ export function ExternalAIToolsProvider({
         const newTool = data.tool;
 
         setTools((prev) => [newTool, ...prev]);
-        setPagination((prev) => ({ ...prev, total: prev.total + 1 }));
+        setPagination((prev) =>
+          prev ? { ...prev, total: prev.total + 1 } : null
+        );
 
         return newTool;
       } catch (err) {
@@ -202,7 +209,9 @@ export function ExternalAIToolsProvider({
       }
 
       setTools((prev) => prev.filter((tool) => tool.id !== id));
-      setPagination((prev) => ({ ...prev, total: prev.total - 1 }));
+      setPagination((prev) =>
+        prev ? { ...prev, total: prev.total - 1 } : null
+      );
 
       return true;
     } catch (err) {
@@ -211,28 +220,70 @@ export function ExternalAIToolsProvider({
     }
   }, []);
 
+  const loadMoreTools = useCallback(
+    async (params?: PaginationParams) => {
+      if (!pagination?.hasNext || isLoading || isLoadingMore) return;
+
+      setIsLoadingMore(true);
+      try {
+        const nextPage = pagination.page + 1;
+        const searchParams = new URLSearchParams();
+
+        searchParams.set('page', nextPage.toString());
+        searchParams.set('limit', pagination.limit.toString());
+        if (params?.search) searchParams.set('search', params.search);
+        if (params?.tags) searchParams.set('tags', params.tags);
+
+        const response = await fetch(`/api/external-ai-tools?${searchParams}`);
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch more external AI tools');
+        }
+
+        const data = await response.json();
+        const newTools = data.tools || [];
+
+        // Filter out any tools that already exist to prevent duplicates
+        setTools((prev) => {
+          const existingIds = new Set(prev.map((tool) => tool.id));
+          const uniqueNewTools = newTools.filter(
+            (tool: any) => !existingIds.has(tool.id)
+          );
+          return [...prev, ...uniqueNewTools];
+        });
+
+        setPagination(data.pagination || null);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'An error occurred');
+      } finally {
+        setIsLoadingMore(false);
+      }
+    },
+    [pagination, isLoading, isLoadingMore]
+  );
+
   const loadMore = useCallback(async () => {
-    if (pagination.hasNext && !isLoading) {
-      await fetchTools({
-        page: pagination.page + 1,
-        limit: pagination.limit,
-        search: searchQuery,
-      });
-    }
-  }, [pagination, isLoading, fetchTools, searchQuery]);
+    // For backward compatibility, use loadMoreTools
+    return loadMoreTools();
+  }, [loadMoreTools]);
 
   const value: ExternalAIToolsContextType = {
     tools,
     isLoading,
+    isLoadingMore,
     error,
     pagination,
     fetchTools,
+    refreshTools,
+    loadMoreTools,
     createTool,
     updateTool,
     deleteTool,
     loadMore,
     searchQuery,
     setSearchQuery,
+    showMyToolsOnly,
+    setShowMyToolsOnly,
   };
 
   return (

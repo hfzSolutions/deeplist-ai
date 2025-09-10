@@ -106,16 +106,16 @@ export async function POST(
     }
 
     const imageBuffer = await downloadResponse.arrayBuffer();
-    
+
     // Compress the image using Sharp
     const compressedBuffer = await sharp(Buffer.from(imageBuffer))
-      .resize(1200, 1200, { 
-        fit: 'inside', 
-        withoutEnlargement: true 
+      .resize(1200, 1200, {
+        fit: 'inside',
+        withoutEnlargement: true,
       })
-      .jpeg({ 
-        quality: 70, 
-        progressive: true 
+      .jpeg({
+        quality: 70,
+        progressive: true,
       })
       .toBuffer();
 

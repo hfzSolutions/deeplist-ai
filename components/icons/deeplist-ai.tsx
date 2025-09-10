@@ -1,17 +1,17 @@
-import * as React from "react"
-import Image from "next/image"
-import type { HTMLAttributes } from "react"
+import * as React from 'react';
+import Image from 'next/image';
+import type { HTMLAttributes } from 'react';
 
 interface DeeplistAIIconProps extends HTMLAttributes<HTMLDivElement> {
-  width?: number
-  height?: number
+  width?: number;
+  height?: number;
 }
 
-export function DeeplistAIIcon({ 
-  width = 24, 
-  height = 24, 
-  className, 
-  ...props 
+export function DeeplistAIIcon({
+  width = 24,
+  height = 24,
+  className,
+  ...props
 }: DeeplistAIIconProps) {
   return (
     <div className={className} {...props}>
@@ -23,5 +23,5 @@ export function DeeplistAIIcon({
         className="object-contain"
       />
     </div>
-  )
+  );
 }

@@ -22,9 +22,8 @@ import { useAgents } from '@/lib/agent-store/provider';
 import { useCategories } from '@/lib/categories-store/provider';
 import { cn } from '@/lib/utils';
 import {
+  BookmarkSimple,
   CaretDown,
-  Heart,
-  HeartStraight,
   Plus,
   Robot,
   Storefront,
@@ -212,14 +211,14 @@ export function AgentSelector() {
                         className="hover:bg-accent h-6 w-6 p-0"
                         onClick={handleToggleFavorite}
                       >
-                        {isFav ? (
-                          <Heart size={12} className="text-red-500" />
-                        ) : (
-                          <HeartStraight
-                            size={12}
-                            className="text-muted-foreground hover:text-red-500"
-                          />
-                        )}
+                        <BookmarkSimple
+                          size={12}
+                          className={
+                            isFav
+                              ? 'text-blue-500'
+                              : 'text-muted-foreground hover:text-blue-500'
+                          }
+                        />
                       </Button>
                     </div>
                   </DropdownMenuItem>

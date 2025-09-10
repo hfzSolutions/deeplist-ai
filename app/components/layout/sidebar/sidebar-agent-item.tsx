@@ -15,7 +15,7 @@ import { Agent } from '@/lib/agent-store/types';
 import { useUser } from '@/lib/user-store/provider';
 import { cn } from '@/lib/utils';
 import {
-  Bookmark,
+  BookmarkSimple,
   DotsThreeVertical,
   Eye,
   EyeSlash,
@@ -169,12 +169,12 @@ export function SidebarAgentItem({
               <DropdownMenuItem onClick={handleToggleFavorite}>
                 {isFav ? (
                   <>
-                    <Bookmark size={16} className="mr-2" />
+                    <BookmarkSimple size={16} className="mr-2" />
                     Remove
                   </>
                 ) : (
                   <>
-                    <Bookmark size={16} className="mr-2" />
+                    <BookmarkSimple size={16} className="mr-2" />
                     Save
                   </>
                 )}

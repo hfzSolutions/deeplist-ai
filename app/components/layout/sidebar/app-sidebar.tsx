@@ -28,8 +28,6 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { HistoryTrigger } from '../../history/history-trigger';
 import { DialogCreateAgent } from './dialog-create-agent';
-import { SidebarAgents } from './sidebar-agents';
-import { SidebarFavoriteAgents } from './sidebar-favorite-agents';
 import { SidebarProject } from './sidebar-project';
 import { SidebarUserMenu } from './sidebar-user-menu';
 
@@ -163,12 +161,6 @@ export function AppSidebar() {
               <SidebarSeparator className="mx-0 mb-4" />
             </>
           )}
-
-          {/* Agent Lists */}
-          <div className="space-y-3">
-            <SidebarFavoriteAgents />
-            <SidebarAgents />
-          </div>
         </ScrollArea>
       </SidebarContent>
       <SidebarFooter>

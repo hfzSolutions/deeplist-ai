@@ -1,6 +1,5 @@
 'use client';
 
-import { LoginPrompt } from '@/app/components/auth/login-prompt';
 import { useBreakpoint } from '@/app/hooks/use-breakpoint';
 import { useKeyShortcut } from '@/app/hooks/use-key-shortcut';
 import { X } from 'lucide-react';
@@ -39,7 +38,11 @@ import { ModelConfig } from '@/lib/models/types';
 import { PROVIDERS } from '@/lib/providers';
 import { useUserPreferences } from '@/lib/user-preference-store/provider';
 import { cn } from '@/lib/utils';
-import { CaretDownIcon, MagnifyingGlassIcon } from '@phosphor-icons/react';
+import {
+  BrainIcon,
+  CaretDownIcon,
+  MagnifyingGlassIcon,
+} from '@phosphor-icons/react';
 import { useRef, useState } from 'react';
 
 import { SubMenu } from './sub-menu';
@@ -106,7 +109,7 @@ export function ModelSelector({
         }}
       >
         <div className="flex items-center gap-3">
-          {provider?.icon && <provider.icon className="size-5" />}
+          <BrainIcon className="size-5" />
           <div className="flex flex-col gap-0">
             <span className="text-sm">{model.name}</span>
           </div>
@@ -135,9 +138,7 @@ export function ModelSelector({
       disabled={isLoadingModels}
     >
       <div className="flex items-center gap-2 min-w-0 flex-1">
-        {currentProvider?.icon && (
-          <currentProvider.icon className="size-5 flex-shrink-0" />
-        )}
+        <BrainIcon className="size-5 flex-shrink-0" />
         <span className="truncate text-sm">
           {currentModel?.name || 'Select model'}
         </span>
@@ -152,60 +153,7 @@ export function ModelSelector({
     setSearchQuery(e.target.value);
   };
 
-  // State for login prompt - must be at top level
-  const [loginPromptOpen, setLoginPromptOpen] = React.useState(false);
-
-  // If user is not authenticated, show login prompt when clicked
-  if (!isUserAuthenticated) {
-    return (
-      <>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              size="sm"
-              variant="secondary"
-              className={cn(
-                'border-border dark:bg-secondary text-accent-foreground h-9 w-auto border bg-transparent max-w-[140px]',
-                className
-              )}
-              type="button"
-              onClick={() => setLoginPromptOpen(true)}
-            >
-              <div className="flex items-center gap-2 min-w-0 flex-1">
-                {currentProvider?.icon && (
-                  <currentProvider.icon className="size-5 flex-shrink-0" />
-                )}
-                <span className="truncate text-sm">{currentModel?.name}</span>
-              </div>
-              <CaretDownIcon className="size-4 flex-shrink-0" />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent>Select a model</TooltipContent>
-        </Tooltip>
-
-        {/* Login Prompt Dialog */}
-        <Dialog open={loginPromptOpen} onOpenChange={setLoginPromptOpen}>
-          <DialogContent className="max-h-[90vh] w-full max-w-md overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle>Model Selection</DialogTitle>
-              <DialogDescription>
-                Sign in to select and use different AI models.
-              </DialogDescription>
-            </DialogHeader>
-            <div className="py-4">
-              <LoginPrompt
-                title="Login Required"
-                description="You need to be logged in to select models. Please sign in to continue."
-                action="select models"
-                actionText="Sign In"
-                className="border-0 shadow-none"
-              />
-            </div>
-          </DialogContent>
-        </Dialog>
-      </>
-    );
-  }
+  // Allow model selection without authentication
 
   if (isMobile) {
     return (
@@ -329,7 +277,7 @@ export function ModelSelector({
                       }}
                     >
                       <div className="flex items-center gap-3">
-                        {provider?.icon && <provider.icon className="size-5" />}
+                        <BrainIcon className="size-5" />
                         <div className="flex flex-col gap-0">
                           <span className="text-sm">{model.name}</span>
                         </div>

@@ -20,19 +20,16 @@ import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
-
 import { Skeleton } from '@/components/ui/skeleton';
 import { useExternalAITools } from '@/lib/external-ai-tools-store/provider';
 import { ExternalAITool } from '@/lib/external-ai-tools-store/types';
 import { useUser } from '@/lib/user-store/provider';
 import {
   DotsThreeVertical,
-  Eye,
   LinkSimple,
   MagnifyingGlass,
   Pencil,
   Plus,
-  Robot,
   Share,
   Trash,
   X,
@@ -41,29 +38,25 @@ import {
 import { useCallback, useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { useInfiniteScrollIsolated } from '@/app/hooks/use-infinite-scroll-isolated';
-import { DialogExternalAITool } from './dialog-external-ai-tool';
-import { DialogExternalAIToolDetails } from './dialog-external-ai-tool-details';
-import { DialogBadge } from './dialog-badge';
+import { DialogExternalAITool } from '../homepage/dialog-external-ai-tool';
+import { DialogExternalAIToolDetails } from '../homepage/dialog-external-ai-tool-details';
+import { DialogBadge } from '../homepage/dialog-badge';
 import { DialogShare } from '../common/dialog-share';
 
-interface ExternalAIToolsProps {
+interface ExternalToolsSectionProps {
   toolId?: string | null;
-  isActive?: boolean;
 }
 
-export function ExternalAITools({
-  toolId,
-  isActive = true,
-}: ExternalAIToolsProps) {
+export function ExternalToolsSection({ toolId }: ExternalToolsSectionProps) {
   const {
     tools,
     isLoading,
+    isLoadingMore,
     error,
     pagination,
     refreshTools,
     loadMoreTools,
     deleteTool,
-    loadMore,
     searchQuery,
     setSearchQuery,
     showMyToolsOnly,
@@ -82,26 +75,19 @@ export function ExternalAITools({
   const [showLoginPrompt, setShowLoginPrompt] = useState(false);
   const [loginPromptAction, setLoginPromptAction] = useState('');
   const [toolRedirectProcessed, setToolRedirectProcessed] = useState(false);
-  const [isLoadingMore, setIsLoadingMore] = useState(false);
-
   // Handle load more
   const handleLoadMore = useCallback(async () => {
-    if (!pagination?.hasNext || isLoadingMore) return;
+    if (!pagination?.hasNext || isLoading || isLoadingMore) return;
 
-    setIsLoadingMore(true);
-    try {
-      await loadMoreTools();
-    } finally {
-      setIsLoadingMore(false);
-    }
-  }, [pagination, loadMoreTools, isLoadingMore]);
+    await loadMoreTools();
+  }, [pagination, loadMoreTools, isLoading, isLoadingMore]);
 
-  // Infinite scroll hook
+  // Infinite scroll hook - completely isolated
   const infiniteScrollRef = useInfiniteScrollIsolated({
     hasNextPage: !!pagination?.hasNext,
     isLoading: isLoadingMore,
     onLoadMore: handleLoadMore,
-    enabled: isActive,
+    enabled: true, // Always enabled for this component
   });
 
   useEffect(() => {
@@ -193,10 +179,6 @@ export function ExternalAITools({
 
     handleToolRedirect();
   }, [toolId, tools, isLoading, toolRedirectProcessed]);
-
-  const handleVisitTool = (website: string) => {
-    window.open(website, '_blank', 'noopener,noreferrer');
-  };
 
   const handleLoginPrompt = (action: string) => {
     setLoginPromptAction(action);
