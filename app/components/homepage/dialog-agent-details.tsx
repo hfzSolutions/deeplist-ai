@@ -69,7 +69,7 @@ export function DialogAgentDetails({
   const displayDescription =
     isDescriptionExpanded || !shouldTruncateDescription
       ? agent.description
-      : agent.description.substring(0, DESCRIPTION_LIMIT) + '...';
+      : agent.description?.substring(0, DESCRIPTION_LIMIT) + '...';
 
   const HeaderContent = () => (
     <>
