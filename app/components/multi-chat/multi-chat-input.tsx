@@ -1,33 +1,33 @@
-"use client"
+'use client';
 
-import { AgentSelector } from "@/components/common/agent-selector/base"
-import { MultiModelSelector } from "@/components/common/multi-model-selector/base"
+import { AgentSelector } from '@/components/common/agent-selector/base';
+import { MultiModelSelector } from '@/components/common/multi-model-selector/base';
 import {
   PromptInput,
   PromptInputAction,
   PromptInputActions,
   PromptInputTextarea,
-} from "@/components/prompt-kit/prompt-input"
-import { Button } from "@/components/ui/button"
-import { useAgents } from "@/lib/agent-store/provider"
-import { ArrowUp, Stop } from "@phosphor-icons/react"
-import React, { useCallback } from "react"
+} from '@/components/prompt-kit/prompt-input';
+import { Button } from '@/components/ui/button';
+import { useAgents } from '@/lib/agent-store/provider';
+import { ArrowUp, Stop } from '@phosphor-icons/react';
+import React, { useCallback } from 'react';
 
 type MultiChatInputProps = {
-  value: string
-  onValueChange: (value: string) => void
-  onSend: () => void
-  isSubmitting?: boolean
-  files: File[]
-  onFileUpload: (files: File[]) => void
-  onFileRemove: (file: File) => void
-  selectedModelIds: string[]
-  onSelectedModelIdsChange: (modelIds: string[]) => void
-  isUserAuthenticated: boolean
-  stop: () => void
-  status?: "submitted" | "streaming" | "ready" | "error"
-  anyLoading?: boolean
-}
+  value: string;
+  onValueChange: (value: string) => void;
+  onSend: () => void;
+  isSubmitting?: boolean;
+  files: File[];
+  onFileUpload: (files: File[]) => void;
+  onFileRemove: (file: File) => void;
+  selectedModelIds: string[];
+  onSelectedModelIdsChange: (modelIds: string[]) => void;
+  isUserAuthenticated: boolean;
+  stop: () => void;
+  status?: 'submitted' | 'streaming' | 'ready' | 'error';
+  anyLoading?: boolean;
+};
 
 export function MultiChatInput({
   value,
@@ -40,45 +40,45 @@ export function MultiChatInput({
   status,
   anyLoading,
 }: MultiChatInputProps) {
-  const { selectedAgent, setSelectedAgent, agents } = useAgents()
-  const isOnlyWhitespace = (text: string) => !/[^\s]/.test(text)
+  const { selectedAgent, setSelectedAgent, agents } = useAgents();
+  const isOnlyWhitespace = (text: string) => !/[^\s]/.test(text);
 
   const handleSend = useCallback(() => {
     if (isSubmitting || anyLoading) {
-      return
+      return;
     }
 
-    if (status === "streaming") {
-      stop()
-      return
+    if (status === 'streaming') {
+      stop();
+      return;
     }
 
-    onSend()
-  }, [isSubmitting, anyLoading, onSend, status, stop])
+    onSend();
+  }, [isSubmitting, anyLoading, onSend, status, stop]);
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
       if (isSubmitting || anyLoading) {
-        e.preventDefault()
-        return
+        e.preventDefault();
+        return;
       }
 
-      if (e.key === "Enter" && status === "streaming") {
-        e.preventDefault()
-        return
+      if (e.key === 'Enter' && status === 'streaming') {
+        e.preventDefault();
+        return;
       }
 
-      if (e.key === "Enter" && !e.shiftKey) {
+      if (e.key === 'Enter' && !e.shiftKey) {
         if (isOnlyWhitespace(value)) {
-          return
+          return;
         }
 
-        e.preventDefault()
-        onSend()
+        e.preventDefault();
+        onSend();
       }
     },
     [isSubmitting, anyLoading, onSend, status, value]
-  )
+  );
 
   return (
     <div className="relative flex w-full flex-col gap-4">
@@ -100,14 +100,20 @@ export function MultiChatInput({
                 selectedAgentId={selectedAgent?.id}
                 setSelectedAgentId={(agentId) => {
                   if (agentId) {
-                    const agent = agents.find(a => a.id === agentId)
-                    setSelectedAgent(agent || null)
+                    const agent = agents.find((a) => a.id === agentId);
+                    setSelectedAgent(agent || null);
                     // Add agent's model to selected models if agent has one
-                    if (agent?.model && !selectedModelIds.includes(agent.model)) {
-                      onSelectedModelIdsChange([...selectedModelIds, agent.model])
+                    if (
+                      agent?.model &&
+                      !selectedModelIds.includes(agent.model)
+                    ) {
+                      onSelectedModelIdsChange([
+                        ...selectedModelIds,
+                        agent.model,
+                      ]);
                     }
                   } else {
-                    setSelectedAgent(null)
+                    setSelectedAgent(null);
                   }
                 }}
                 isUserAuthenticated={true}
@@ -119,23 +125,23 @@ export function MultiChatInput({
               />
             </div>
             <PromptInputAction
-              tooltip={status === "streaming" ? "Stop" : "Send"}
+              tooltip={status === 'streaming' ? 'Stop' : 'Send'}
             >
               <Button
                 size="sm"
                 className="size-9 rounded-full transition-all duration-300 ease-out"
                 disabled={Boolean(
                   !value ||
-                  isSubmitting ||
-                  anyLoading ||
-                  isOnlyWhitespace(value) ||
-                  selectedModelIds.length === 0
+                    isSubmitting ||
+                    anyLoading ||
+                    isOnlyWhitespace(value) ||
+                    selectedModelIds.length === 0
                 )}
                 type="button"
                 onClick={handleSend}
-                aria-label={status === "streaming" ? "Stop" : "Send message"}
+                aria-label={status === 'streaming' ? 'Stop' : 'Send message'}
               >
-                {status === "streaming" || anyLoading ? (
+                {status === 'streaming' || anyLoading ? (
                   <Stop className="size-4" />
                 ) : (
                   <ArrowUp className="size-4" />
@@ -144,7 +150,12 @@ export function MultiChatInput({
             </PromptInputAction>
           </PromptInputActions>
         </PromptInput>
+        <div className="flex justify-center px-2 pt-1">
+          <p className="text-xs text-muted-foreground/60">
+            AI responses are for reference only
+          </p>
+        </div>
       </div>
     </div>
-  )
+  );
 }

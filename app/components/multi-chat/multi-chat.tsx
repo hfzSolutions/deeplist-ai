@@ -108,7 +108,7 @@ export function MultiChat() {
     const groups: {
       [key: string]: {
         userMessage: MessageType;
-        assistantMessages: MessageType[];
+        agentMessages: MessageType[];
       };
     } = {};
 
@@ -120,7 +120,7 @@ export function MultiChat() {
         if (!groups[groupKey]) {
           groups[groupKey] = {
             userMessage: message,
-            assistantMessages: [],
+            agentMessages: [],
           };
         }
       } else if (message.role === 'assistant') {
@@ -137,10 +137,10 @@ export function MultiChat() {
           if (!groups[groupKey]) {
             groups[groupKey] = {
               userMessage: associatedUserMessage,
-              assistantMessages: [],
+              agentMessages: [],
             };
           }
-          groups[groupKey].assistantMessages.push(message);
+          groups[groupKey].agentMessages.push(message);
         }
       }
     }
@@ -149,7 +149,7 @@ export function MultiChat() {
       if (group.userMessage) {
         persistedGroups[groupKey] = {
           userMessage: group.userMessage,
-          responses: group.assistantMessages.map((msg, index) => {
+          responses: group.agentMessages.map((msg, index) => {
             const model =
               (msg as any).model || selectedModelIds[index] || `model-${index}`;
             const provider =
@@ -179,7 +179,7 @@ export function MultiChat() {
     modelChats.forEach((chat) => {
       for (let i = 0; i < chat.messages.length; i += 2) {
         const userMsg = chat.messages[i];
-        const assistantMsg = chat.messages[i + 1];
+        const agentMsg = chat.messages[i + 1];
 
         if (userMsg?.role === 'user') {
           const groupKey = userMsg.content;
@@ -194,7 +194,7 @@ export function MultiChat() {
             };
           }
 
-          if (assistantMsg?.role === 'assistant') {
+          if (agentMsg?.role === 'assistant') {
             const existingResponse = liveGroups[groupKey].responses.find(
               (r) => r.model === chat.model.id
             );
@@ -202,7 +202,7 @@ export function MultiChat() {
             if (!existingResponse) {
               liveGroups[groupKey].responses.push({
                 model: chat.model.id,
-                message: assistantMsg,
+                message: agentMsg,
                 isLoading: false,
                 provider: chat.model.provider,
               });

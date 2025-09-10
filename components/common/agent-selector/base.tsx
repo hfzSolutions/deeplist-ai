@@ -212,7 +212,7 @@ export function AgentSelector({
         <div className="flex items-center gap-3">
           <RobotIcon className="size-5" />
           <div className="flex flex-col gap-0">
-            <span className="text-sm font-medium">Default Assistant</span>
+            <span className="text-sm font-medium">Default Agent</span>
             <span className="text-muted-foreground text-xs">
               Use your default system prompt
             </span>
@@ -540,7 +540,7 @@ export function AgentSelector({
                       <RobotIcon className="size-5" />
                       <div className="flex flex-col gap-0">
                         <span className="text-sm font-medium">
-                          Default Assistant
+                          Default Agent
                         </span>
                         <span className="text-muted-foreground text-xs">
                           Use your default system prompt

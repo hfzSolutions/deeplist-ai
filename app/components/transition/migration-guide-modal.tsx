@@ -8,7 +8,11 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Bookmark, MagnifyingGlass, Sparkle } from '@phosphor-icons/react';
+import {
+  BookmarkSimple,
+  MagnifyingGlass,
+  Sparkle,
+} from '@phosphor-icons/react';
 
 interface MigrationGuideModalProps {
   open: boolean;
@@ -21,7 +25,7 @@ export function MigrationGuideModal({
 }: MigrationGuideModalProps) {
   const features = [
     {
-      icon: <Bookmark className="h-4 w-4" />,
+      icon: <BookmarkSimple className="h-4 w-4" />,
       title: 'Never Lose a Chat',
       description: 'All your conversations are saved',
     },

@@ -1,42 +1,42 @@
-"use client"
+'use client';
 
-import { AgentSelector } from "@/components/common/agent-selector/base"
-import { ModelSelector } from "@/components/common/model-selector/base"
+import { AgentSelector } from '@/components/common/agent-selector/base';
+import { ModelSelector } from '@/components/common/model-selector/base';
 import {
   PromptInput,
   PromptInputAction,
   PromptInputActions,
   PromptInputTextarea,
-} from "@/components/prompt-kit/prompt-input"
-import { Button } from "@/components/ui/button"
-import { useAgents } from "@/lib/agent-store/provider"
-import { getModelInfo } from "@/lib/models"
-import { ArrowUpIcon, StopIcon } from "@phosphor-icons/react"
-import { useCallback, useMemo } from "react"
-import { PromptSystem } from "../suggestions/prompt-system"
-import { ButtonFileUpload } from "./button-file-upload"
-import { ButtonSearch } from "./button-search"
-import { FileList } from "./file-list"
+} from '@/components/prompt-kit/prompt-input';
+import { Button } from '@/components/ui/button';
+import { useAgents } from '@/lib/agent-store/provider';
+import { getModelInfo } from '@/lib/models';
+import { ArrowUpIcon, StopIcon } from '@phosphor-icons/react';
+import { useCallback, useMemo } from 'react';
+import { PromptSystem } from '../suggestions/prompt-system';
+import { ButtonFileUpload } from './button-file-upload';
+import { ButtonSearch } from './button-search';
+import { FileList } from './file-list';
 
 type ChatInputProps = {
-  value: string
-  onValueChange: (value: string) => void
-  onSend: () => void
-  isSubmitting?: boolean
-  hasMessages?: boolean
-  files: File[]
-  onFileUpload: (files: File[]) => void
-  onFileRemove: (file: File) => void
-  onSuggestion: (suggestion: string) => void
-  hasSuggestions?: boolean
-  onSelectModel: (model: string) => void
-  selectedModel: string
-  isUserAuthenticated: boolean
-  stop: () => void
-  status?: "submitted" | "streaming" | "ready" | "error"
-  setEnableSearch: (enabled: boolean) => void
-  enableSearch: boolean
-}
+  value: string;
+  onValueChange: (value: string) => void;
+  onSend: () => void;
+  isSubmitting?: boolean;
+  hasMessages?: boolean;
+  files: File[];
+  onFileUpload: (files: File[]) => void;
+  onFileRemove: (file: File) => void;
+  onSuggestion: (suggestion: string) => void;
+  hasSuggestions?: boolean;
+  onSelectModel: (model: string) => void;
+  selectedModel: string;
+  isUserAuthenticated: boolean;
+  stop: () => void;
+  status?: 'submitted' | 'streaming' | 'ready' | 'error';
+  setEnableSearch: (enabled: boolean) => void;
+  enableSearch: boolean;
+};
 
 export function ChatInput({
   value,
@@ -56,93 +56,93 @@ export function ChatInput({
   setEnableSearch,
   enableSearch,
 }: ChatInputProps) {
-  const { selectedAgent, setSelectedAgent, agents } = useAgents()
-  const selectModelConfig = getModelInfo(selectedModel)
-  const hasSearchSupport = Boolean(selectModelConfig?.webSearch)
-  const isOnlyWhitespace = (text: string) => !/[^\s]/.test(text)
+  const { selectedAgent, setSelectedAgent, agents } = useAgents();
+  const selectModelConfig = getModelInfo(selectedModel);
+  const hasSearchSupport = Boolean(selectModelConfig?.webSearch);
+  const isOnlyWhitespace = (text: string) => !/[^\s]/.test(text);
 
   const handleSend = useCallback(() => {
     if (isSubmitting) {
-      return
+      return;
     }
 
-    if (status === "streaming") {
-      stop()
-      return
+    if (status === 'streaming') {
+      stop();
+      return;
     }
 
-    onSend()
-  }, [isSubmitting, onSend, status, stop])
+    onSend();
+  }, [isSubmitting, onSend, status, stop]);
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
       if (isSubmitting) {
-        e.preventDefault()
-        return
+        e.preventDefault();
+        return;
       }
 
-      if (e.key === "Enter" && status === "streaming") {
-        e.preventDefault()
-        return
+      if (e.key === 'Enter' && status === 'streaming') {
+        e.preventDefault();
+        return;
       }
 
-      if (e.key === "Enter" && !e.shiftKey) {
+      if (e.key === 'Enter' && !e.shiftKey) {
         if (isOnlyWhitespace(value)) {
-          return
+          return;
         }
 
-        e.preventDefault()
-        onSend()
+        e.preventDefault();
+        onSend();
       }
     },
     [isSubmitting, onSend, status, value]
-  )
+  );
 
   const handlePaste = useCallback(
     async (e: React.ClipboardEvent) => {
-      const items = e.clipboardData?.items
-      if (!items) return
+      const items = e.clipboardData?.items;
+      if (!items) return;
 
       const hasImageContent = Array.from(items).some((item) =>
-        item.type.startsWith("image/")
-      )
+        item.type.startsWith('image/')
+      );
 
       if (!isUserAuthenticated && hasImageContent) {
-        e.preventDefault()
-        return
+        e.preventDefault();
+        return;
       }
 
       if (isUserAuthenticated && hasImageContent) {
-        const imageFiles: File[] = []
+        const imageFiles: File[] = [];
 
         for (const item of Array.from(items)) {
-          if (item.type.startsWith("image/")) {
-            const file = item.getAsFile()
+          if (item.type.startsWith('image/')) {
+            const file = item.getAsFile();
             if (file) {
               const newFile = new File(
                 [file],
-                `pasted-image-${Date.now()}.${file.type.split("/")[1]}`,
+                `pasted-image-${Date.now()}.${file.type.split('/')[1]}`,
                 { type: file.type }
-              )
-              imageFiles.push(newFile)
+              );
+              imageFiles.push(newFile);
             }
           }
         }
 
         if (imageFiles.length > 0) {
-          onFileUpload(imageFiles)
+          onFileUpload(imageFiles);
         }
       }
       // Text pasting will work by default for everyone
     },
     [isUserAuthenticated, onFileUpload]
-  )
+  );
 
   useMemo(() => {
     if (!hasSearchSupport && enableSearch) {
-      setEnableSearch?.(false)
+      setEnableSearch?.(false);
     }
-  }, [hasSearchSupport, enableSearch, setEnableSearch])
+  }, [hasSearchSupport, enableSearch, setEnableSearch]);
 
   return (
     <div className="relative flex w-full flex-col gap-4">
@@ -178,14 +178,14 @@ export function ChatInput({
                 selectedAgentId={selectedAgent?.id}
                 setSelectedAgentId={(agentId) => {
                   if (agentId) {
-                    const agent = agents.find((a) => a.id === agentId)
-                    setSelectedAgent(agent || null)
+                    const agent = agents.find((a) => a.id === agentId);
+                    setSelectedAgent(agent || null);
                     // Update model to agent's model if agent has one
                     if (agent?.model) {
-                      onSelectModel(agent.model)
+                      onSelectModel(agent.model);
                     }
                   } else {
-                    setSelectedAgent(null)
+                    setSelectedAgent(null);
                   }
                 }}
                 isUserAuthenticated={isUserAuthenticated}
@@ -206,7 +206,7 @@ export function ChatInput({
               ) : null}
             </div>
             <PromptInputAction
-              tooltip={status === "streaming" ? "Stop" : "Send"}
+              tooltip={status === 'streaming' ? 'Stop' : 'Send'}
             >
               <Button
                 size="sm"
@@ -216,9 +216,9 @@ export function ChatInput({
                 )}
                 type="button"
                 onClick={handleSend}
-                aria-label={status === "streaming" ? "Stop" : "Send message"}
+                aria-label={status === 'streaming' ? 'Stop' : 'Send message'}
               >
-                {status === "streaming" ? (
+                {status === 'streaming' ? (
                   <StopIcon className="size-4" />
                 ) : (
                   <ArrowUpIcon className="size-4" />
@@ -227,7 +227,12 @@ export function ChatInput({
             </PromptInputAction>
           </PromptInputActions>
         </PromptInput>
+        <div className="flex justify-center px-2 pt-1">
+          <p className="text-xs text-muted-foreground/60">
+            AI responses are for reference only
+          </p>
+        </div>
       </div>
     </div>
-  )
+  );
 }

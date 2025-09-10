@@ -26,11 +26,14 @@ export function AgentProvider({ children }: { children: React.ReactNode }) {
   const [favoriteAgents, setFavoriteAgents] = useState<Agent[]>([]);
   const [historyAgents, setHistoryAgents] = useState<Agent[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [isSidebarLoading, setIsSidebarLoading] = useState(true);
   const [isFavoritesLoading, setIsFavoritesLoading] = useState(true);
   const [isHistoryLoading, setIsHistoryLoading] = useState(true);
   const [selectedAgent, setSelectedAgent] = useState<Agent | null>(null);
   const [publicAgentCount, setPublicAgentCount] = useState<number>(0);
+  const [showMyAgentsOnly, setShowMyAgentsOnly] = useState(false);
+  const [showSavedAgentsOnly, setShowSavedAgentsOnly] = useState(false);
   const [pagination, setPagination] = useState<{
     page: number;
     limit: number;
@@ -269,8 +272,18 @@ export function AgentProvider({ children }: { children: React.ReactNode }) {
 
   const loadMoreAgents = useCallback(
     async (params?: PaginationParams) => {
-      if (!pagination?.hasNext || isLoading) return;
+      console.log('loadMoreAgents called:', {
+        hasNext: pagination?.hasNext,
+        isLoading,
+        isLoadingMore,
+        currentPage: pagination?.page,
+        totalPages: pagination?.totalPages,
+        currentAgentsCount: agents.length,
+      });
 
+      if (!pagination?.hasNext || isLoading || isLoadingMore) return;
+
+      setIsLoadingMore(true);
       try {
         const nextPage = pagination.page + 1;
         const searchParams = new URLSearchParams();
@@ -281,6 +294,8 @@ export function AgentProvider({ children }: { children: React.ReactNode }) {
         if (params?.tags) searchParams.set('tags', params.tags);
         if (params?.category) searchParams.set('category', params.category);
 
+        console.log('Loading more agents from page:', nextPage);
+
         const response = await fetchClient(
           `/api/agents?${searchParams.toString()}`
         );
@@ -289,12 +304,15 @@ export function AgentProvider({ children }: { children: React.ReactNode }) {
           const data = await response.json();
           const newAgents = data.agents || [];
 
+          console.log('Received new agents:', newAgents.length);
+
           // Filter out any agents that already exist to prevent duplicates
           setAgents((prev) => {
             const existingIds = new Set(prev.map((agent) => agent.id));
             const uniqueNewAgents = newAgents.filter(
               (agent: any) => !existingIds.has(agent.id)
             );
+            console.log('Adding unique new agents:', uniqueNewAgents.length);
             return [...prev, ...uniqueNewAgents];
           });
 
@@ -302,9 +320,11 @@ export function AgentProvider({ children }: { children: React.ReactNode }) {
         }
       } catch (error) {
         console.error('Error loading more agents:', error);
+      } finally {
+        setIsLoadingMore(false);
       }
     },
-    [pagination, isLoading]
+    [pagination, isLoading, isLoadingMore, agents.length]
   );
 
   const refreshSidebarAgents = useCallback(async () => {
@@ -418,6 +438,22 @@ export function AgentProvider({ children }: { children: React.ReactNode }) {
     }
   }, [refreshHistoryAgents]);
 
+  const toggleSave = useCallback(
+    async (agentId: string): Promise<boolean> => {
+      try {
+        if (isFavorite(agentId)) {
+          return await removeFromFavorites(agentId);
+        } else {
+          return await addToFavorites(agentId);
+        }
+      } catch (error) {
+        console.error('Error toggling save status:', error);
+        return false;
+      }
+    },
+    [isFavorite, addToFavorites, removeFromFavorites]
+  );
+
   useEffect(() => {
     refreshAgents();
     refreshSidebarAgents();
@@ -438,6 +474,7 @@ export function AgentProvider({ children }: { children: React.ReactNode }) {
     favoriteAgents,
     historyAgents,
     isLoading,
+    isLoadingMore,
     isSidebarLoading,
     isFavoritesLoading,
     isHistoryLoading,
@@ -460,6 +497,11 @@ export function AgentProvider({ children }: { children: React.ReactNode }) {
     addToHistory,
     removeFromHistory,
     clearHistory,
+    showMyAgentsOnly,
+    setShowMyAgentsOnly,
+    showSavedAgentsOnly,
+    setShowSavedAgentsOnly,
+    toggleSave,
   };
 
   return (

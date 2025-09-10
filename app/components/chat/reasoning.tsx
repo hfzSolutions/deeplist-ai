@@ -1,27 +1,27 @@
-import { Markdown } from "@/components/prompt-kit/markdown"
-import { cn } from "@/lib/utils"
-import { CaretDownIcon } from "@phosphor-icons/react"
-import { AnimatePresence, motion } from "framer-motion"
-import { useState } from "react"
+import { Markdown } from '@/components/prompt-kit/markdown';
+import { cn } from '@/lib/utils';
+import { CaretDownIcon } from '@phosphor-icons/react';
+import { AnimatePresence, motion } from 'framer-motion';
+import { useState } from 'react';
 
 type ReasoningProps = {
-  reasoning: string
-  isStreaming?: boolean
-}
+  reasoning: string;
+  isStreaming?: boolean;
+};
 
 const TRANSITION = {
-  type: "spring",
+  type: 'spring',
   duration: 0.2,
   bounce: 0,
-}
+};
 
 export function Reasoning({ reasoning, isStreaming }: ReasoningProps) {
-  const [wasStreaming, setWasStreaming] = useState(isStreaming ?? false)
-  const [isExpanded, setIsExpanded] = useState(() => isStreaming ?? true)
+  const [wasStreaming, setWasStreaming] = useState(isStreaming ?? false);
+  const [isExpanded, setIsExpanded] = useState(() => isStreaming ?? true);
 
   if (wasStreaming && isStreaming === false) {
-    setWasStreaming(false)
-    setIsExpanded(false)
+    setWasStreaming(false);
+    setIsExpanded(false);
   }
 
   return (
@@ -31,11 +31,11 @@ export function Reasoning({ reasoning, isStreaming }: ReasoningProps) {
         onClick={() => setIsExpanded(!isExpanded)}
         type="button"
       >
-        <span>Reasoning</span>
+        <span>{isStreaming ? 'Thinking' : 'Thought'}</span>
         <CaretDownIcon
           className={cn(
-            "size-3 transition-transform",
-            isExpanded ? "rotate-180" : ""
+            'size-3 transition-transform',
+            isExpanded ? 'rotate-180' : ''
           )}
         />
       </button>
@@ -45,7 +45,7 @@ export function Reasoning({ reasoning, isStreaming }: ReasoningProps) {
           <motion.div
             className="mt-2 overflow-hidden"
             initial={{ height: 0, opacity: 0 }}
-            animate={{ height: "auto", opacity: 1 }}
+            animate={{ height: 'auto', opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
             transition={TRANSITION}
           >
@@ -56,5 +56,5 @@ export function Reasoning({ reasoning, isStreaming }: ReasoningProps) {
         )}
       </AnimatePresence>
     </div>
-  )
+  );
 }

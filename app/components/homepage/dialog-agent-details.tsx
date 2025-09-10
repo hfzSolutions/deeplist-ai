@@ -46,6 +46,7 @@ export function DialogAgentDetails({
 }: DialogAgentDetailsProps) {
   const isMobile = useBreakpoint(768);
   const [shareDialogOpen, setShareDialogOpen] = useState(false);
+  const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
 
   if (!agent) return null;
 
@@ -61,6 +62,14 @@ export function DialogAgentDetails({
       day: 'numeric',
     });
   };
+
+  const DESCRIPTION_LIMIT = 200; // Character limit for truncated description
+  const shouldTruncateDescription =
+    agent.description && agent.description.length > DESCRIPTION_LIMIT;
+  const displayDescription =
+    isDescriptionExpanded || !shouldTruncateDescription
+      ? agent.description
+      : agent.description.substring(0, DESCRIPTION_LIMIT) + '...';
 
   const HeaderContent = () => (
     <>
@@ -86,38 +95,24 @@ export function DialogAgentDetails({
         </Avatar>
         <div className="flex-1 min-w-0">
           <h2 className="text-xl font-semibold leading-tight">{agent.name}</h2>
-          <p className="mt-1 text-base text-muted-foreground">
-            {agent.description || 'No description available'}
-          </p>
-        </div>
-      </div>
-
-      {/* Model Information */}
-      <div className="space-y-3 mb-6">
-        <h3 className="text-muted-foreground text-sm font-medium tracking-wide uppercase">
-          Model
-        </h3>
-        <div className="flex items-center gap-2">
-          <Badge variant="secondary" className="text-sm">
-            {agent.model || 'No model specified'}
-          </Badge>
-        </div>
-      </div>
-
-      {/* System Prompt */}
-      {agent.system_prompt && (
-        <div className="space-y-3 mb-6">
-          <h3 className="text-muted-foreground text-sm font-medium tracking-wide uppercase">
-            System Prompt
-          </h3>
-          <div className="text-foreground text-base leading-relaxed break-words whitespace-pre-wrap bg-muted/50 rounded-lg p-4 max-h-48 overflow-y-auto">
-            {agent.system_prompt}
+          <div className="space-y-2">
+            <p className="mt-1 text-base text-muted-foreground">
+              {displayDescription || 'No description available'}
+            </p>
+            {shouldTruncateDescription && (
+              <button
+                onClick={() => setIsDescriptionExpanded(!isDescriptionExpanded)}
+                className="text-sm text-primary hover:underline font-medium"
+              >
+                {isDescriptionExpanded ? 'Show less' : 'Show more'}
+              </button>
+            )}
           </div>
         </div>
-      )}
+      </div>
 
       {/* Agent Details */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
         {/* Category */}
         <div className="space-y-3">
           <h3 className="text-muted-foreground text-sm font-medium tracking-wide uppercase">
@@ -139,7 +134,7 @@ export function DialogAgentDetails({
           <div className="flex items-center gap-2">
             <User size={16} className="text-muted-foreground" />
             <span className="text-sm">
-              {agent.is_public ? 'Public Agent' : 'Private Agent'}
+              {agent.user_id ? 'User Created' : 'System'}
             </span>
           </div>
         </div>
@@ -157,6 +152,30 @@ export function DialogAgentDetails({
           </div>
         </div>
       </div>
+
+      {/* Model Information */}
+      {agent.model && (
+        <div className="space-y-3 mb-6">
+          <h3 className="text-muted-foreground text-sm font-medium tracking-wide uppercase">
+            Model
+          </h3>
+          <div className="flex items-center gap-2">
+            <span className="text-sm">{agent.model}</span>
+          </div>
+        </div>
+      )}
+
+      {/* System Prompt */}
+      {agent.system_prompt && (
+        <div className="space-y-3 mb-6">
+          <h3 className="text-muted-foreground text-sm font-medium tracking-wide uppercase">
+            System Prompt
+          </h3>
+          <div className="text-foreground text-base leading-relaxed break-words whitespace-pre-wrap bg-muted/50 rounded-lg p-4 max-h-48 overflow-y-auto">
+            {agent.system_prompt}
+          </div>
+        </div>
+      )}
     </>
   );
 

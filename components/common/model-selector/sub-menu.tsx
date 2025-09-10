@@ -22,7 +22,7 @@ export function SubMenu({ hoveredModelData }: SubMenuProps) {
     <div className="bg-popover border-border w-[280px] rounded-md border p-3 shadow-md">
       <div className="flex flex-col gap-2">
         <div className="flex items-center gap-3">
-          {provider?.icon && <provider.icon className="size-5" />}
+          <BrainIcon className="size-5" />
           <h3 className="font-medium">{hoveredModelData.name}</h3>
         </div>
 

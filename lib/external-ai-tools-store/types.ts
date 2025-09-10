@@ -43,6 +43,7 @@ export interface PaginatedResponse<T> {
 export interface ExternalAIToolsContextType {
   tools: ExternalAITool[];
   isLoading: boolean;
+  isLoadingMore: boolean;
   error: string | null;
   pagination: {
     page: number;
@@ -51,8 +52,10 @@ export interface ExternalAIToolsContextType {
     totalPages: number;
     hasNext: boolean;
     hasPrev: boolean;
-  };
+  } | null;
   fetchTools: (params?: PaginationParams) => Promise<void>;
+  refreshTools: (params?: PaginationParams) => Promise<void>;
+  loadMoreTools: (params?: PaginationParams) => Promise<void>;
   createTool: (
     tool: Omit<ExternalAITool, 'id' | 'user_id' | 'created_at' | 'updated_at'>,
     logoFile?: File | null
@@ -68,4 +71,6 @@ export interface ExternalAIToolsContextType {
   loadMore: () => Promise<void>;
   searchQuery: string;
   setSearchQuery: (query: string) => void;
+  showMyToolsOnly: boolean;
+  setShowMyToolsOnly: (show: boolean) => void;
 }

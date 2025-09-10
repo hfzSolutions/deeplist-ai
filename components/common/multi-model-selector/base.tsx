@@ -1,6 +1,5 @@
 'use client';
 
-import { LoginPrompt } from '@/app/components/auth/login-prompt';
 import { X } from 'lucide-react';
 import React from 'react';
 import { useBreakpoint } from '@/app/hooks/use-breakpoint';
@@ -41,6 +40,7 @@ import { PROVIDERS } from '@/lib/providers';
 import { useUserPreferences } from '@/lib/user-preference-store/provider';
 import { cn } from '@/lib/utils';
 import {
+  BrainIcon,
   CaretDownIcon,
   CheckIcon,
   MagnifyingGlassIcon,
@@ -125,7 +125,7 @@ export function MultiModelSelector({
             onClick={(e) => e.stopPropagation()}
             onChange={() => handleModelToggle(model.id)}
           />
-          {provider?.icon && <provider.icon className="size-5" />}
+          <BrainIcon className="size-5" />
           <div className="flex flex-col gap-0">
             <span className="text-sm">{model.name}</span>
           </div>
@@ -167,16 +167,17 @@ export function MultiModelSelector({
       <div className="flex min-w-0 flex-1 items-center gap-2">
         <AnimatePresence mode="popLayout">
           {selectedModels.length === 0 ? (
-            <motion.span
+            <motion.div
               key="placeholder"
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.15, ease: 'easeOut' }}
-              className="text-muted-foreground"
+              className="flex items-center gap-2 text-muted-foreground"
             >
-              Select models
-            </motion.span>
+              <BrainIcon className="size-5 flex-shrink-0" />
+              <span>Select models</span>
+            </motion.div>
           ) : selectedModels.length === 1 ? (
             <motion.div
               key="single-model"
@@ -186,25 +187,18 @@ export function MultiModelSelector({
               transition={{ duration: 0.15, ease: 'easeOut' }}
               className="flex items-center gap-2"
             >
-              {(() => {
-                const provider = PROVIDERS.find(
-                  (p) => p.id === selectedModels[0].icon
-                );
-                return provider?.icon ? (
-                  <motion.div
-                    initial={{ scale: 0, rotate: -180 }}
-                    animate={{ scale: 1, rotate: 0 }}
-                    exit={{ scale: 0, rotate: 180 }}
-                    transition={{
-                      type: 'spring',
-                      stiffness: 300,
-                      damping: 20,
-                    }}
-                  >
-                    <provider.icon className="size-5 flex-shrink-0" />
-                  </motion.div>
-                ) : null;
-              })()}
+              <motion.div
+                initial={{ scale: 0, rotate: -180 }}
+                animate={{ scale: 1, rotate: 0 }}
+                exit={{ scale: 0, rotate: 180 }}
+                transition={{
+                  type: 'spring',
+                  stiffness: 300,
+                  damping: 20,
+                }}
+              >
+                <BrainIcon className="size-5 flex-shrink-0" />
+              </motion.div>
               <motion.span
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -225,44 +219,41 @@ export function MultiModelSelector({
             >
               <div className="flex flex-shrink-0 -space-x-1">
                 <AnimatePresence mode="popLayout">
-                  {selectedModels.slice(0, 3).map((model, index) => {
-                    const provider = PROVIDERS.find((p) => p.id === model.icon);
-                    return provider?.icon ? (
-                      <motion.div
-                        key={`${model.id}`}
-                        layout="position"
-                        layoutId={`${model.id}`}
-                        initial={{
-                          scale: 0,
-                          rotate: -180,
-                          x: -20,
-                          opacity: 0,
-                        }}
-                        animate={{
-                          scale: 1,
-                          rotate: 0,
-                          x: 0,
-                          opacity: 1,
-                        }}
-                        exit={{
-                          scale: 0,
-                          rotate: 180,
-                          x: 20,
-                          opacity: 0,
-                        }}
-                        transition={{
-                          type: 'spring',
-                          stiffness: 400,
-                          damping: 25,
-                          delay: index * 0.05,
-                        }}
-                        className="bg-background border-border flex size-5 items-center justify-center rounded-full border"
-                        style={{ zIndex: 3 - index }}
-                      >
-                        <provider.icon className="size-3" />
-                      </motion.div>
-                    ) : null;
-                  })}
+                  {selectedModels.slice(0, 3).map((model, index) => (
+                    <motion.div
+                      key={`${model.id}`}
+                      layout="position"
+                      layoutId={`${model.id}`}
+                      initial={{
+                        scale: 0,
+                        rotate: -180,
+                        x: -20,
+                        opacity: 0,
+                      }}
+                      animate={{
+                        scale: 1,
+                        rotate: 0,
+                        x: 0,
+                        opacity: 1,
+                      }}
+                      exit={{
+                        scale: 0,
+                        rotate: 180,
+                        x: 20,
+                        opacity: 0,
+                      }}
+                      transition={{
+                        type: 'spring',
+                        stiffness: 400,
+                        damping: 25,
+                        delay: index * 0.05,
+                      }}
+                      className="bg-background border-border flex size-5 items-center justify-center rounded-full border"
+                      style={{ zIndex: 3 - index }}
+                    >
+                      <BrainIcon className="size-3" />
+                    </motion.div>
+                  ))}
                 </AnimatePresence>
               </div>
               <span className="text-sm font-medium">
@@ -297,55 +288,7 @@ export function MultiModelSelector({
     setSearchQuery(e.target.value);
   };
 
-  // State for login prompt - must be at top level
-  const [loginPromptOpen, setLoginPromptOpen] = React.useState(false);
-
-  // If user is not authenticated, show login prompt when clicked
-  if (!isUserAuthenticated) {
-    return (
-      <>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              size="sm"
-              variant="secondary"
-              className={cn(
-                'border-border dark:bg-secondary text-accent-foreground h-9 w-auto border bg-transparent',
-                className
-              )}
-              type="button"
-              onClick={() => setLoginPromptOpen(true)}
-            >
-              <span>Select models</span>
-              <CaretDownIcon className="size-4" />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent>Select models</TooltipContent>
-        </Tooltip>
-
-        {/* Login Prompt Dialog */}
-        <Dialog open={loginPromptOpen} onOpenChange={setLoginPromptOpen}>
-          <DialogContent className="max-h-[90vh] w-full max-w-md overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle>Model Selection</DialogTitle>
-              <DialogDescription>
-                Sign in to select and use multiple AI models.
-              </DialogDescription>
-            </DialogHeader>
-            <div className="py-4">
-              <LoginPrompt
-                title="Login Required"
-                description="You need to be logged in to select models. Please sign in to continue."
-                action="select models"
-                actionText="Sign In"
-                className="border-0 shadow-none"
-              />
-            </div>
-          </DialogContent>
-        </Dialog>
-      </>
-    );
-  }
+  // Allow model selection without authentication
 
   if (isMobile) {
     return (
@@ -475,7 +418,7 @@ export function MultiModelSelector({
                       }}
                     >
                       <div className="flex items-center gap-3">
-                        {provider?.icon && <provider.icon className="size-5" />}
+                        <BrainIcon className="size-5" />
                         <div className="flex flex-col gap-0">
                           <span className="text-sm">{model.name}</span>
                         </div>

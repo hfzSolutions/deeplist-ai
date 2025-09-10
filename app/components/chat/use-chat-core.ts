@@ -90,10 +90,10 @@ export function useChatCore({
     });
   }, []);
 
-  // Custom onFinish handler to attach agent data to assistant messages
+  // Custom onFinish handler to attach agent data to agent messages
   const handleFinish = useCallback(
     (message: Message) => {
-      // Attach agent data to assistant messages
+      // Attach agent data to agent messages
       if (message.role === 'assistant' && selectedAgent) {
         const messageWithAgent = {
           ...message,
@@ -132,10 +132,10 @@ export function useChatCore({
     onError: handleError,
   });
 
-  // Transform messages to include agent data for assistant messages
+  // Transform messages to include agent data for agent messages
   const messages = useMemo(() => {
     return rawMessages.map((message) => {
-      // Only add agent data to assistant messages that don't already have it
+      // Only add agent data to agent messages that don't already have it
       if (
         message.role === 'assistant' &&
         selectedAgent &&
