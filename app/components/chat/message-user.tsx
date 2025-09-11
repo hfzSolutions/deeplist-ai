@@ -1,4 +1,4 @@
-"use client"
+'use client';
 
 import {
   MorphingDialog,
@@ -7,37 +7,37 @@ import {
   MorphingDialogContent,
   MorphingDialogImage,
   MorphingDialogTrigger,
-} from "@/components/motion-primitives/morphing-dialog"
+} from '@/components/motion-primitives/morphing-dialog';
 import {
   MessageAction,
   MessageActions,
   Message as MessageContainer,
   MessageContent,
-} from "@/components/prompt-kit/message"
-import { Button } from "@/components/ui/button"
-import { cn } from "@/lib/utils"
-import { Message as MessageType } from "@ai-sdk/react"
-import { Check, Copy, Trash } from "@phosphor-icons/react"
-import Image from "next/image"
-import { useRef, useState } from "react"
+} from '@/components/prompt-kit/message';
+import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
+import { Message as MessageType } from '@ai-sdk/react';
+import { Check, Copy, Trash } from '@phosphor-icons/react';
+import Image from 'next/image';
+import { useRef, useState } from 'react';
 
 const getTextFromDataUrl = (dataUrl: string) => {
-  const base64 = dataUrl.split(",")[1]
-  return base64
-}
+  const base64 = dataUrl.split(',')[1];
+  return base64;
+};
 
 export type MessageUserProps = {
-  hasScrollAnchor?: boolean
-  attachments?: MessageType["experimental_attachments"]
-  children: string
-  copied: boolean
-  copyToClipboard: () => void
-  onEdit: (id: string, newText: string) => void
-  onReload: () => void
-  onDelete: (id: string) => void
-  id: string
-  className?: string
-}
+  hasScrollAnchor?: boolean;
+  attachments?: MessageType['experimental_attachments'];
+  children: string;
+  copied: boolean;
+  copyToClipboard: () => void;
+  onEdit: (id: string, newText: string) => void;
+  onReload: () => void;
+  onDelete: (id: string) => void;
+  id: string;
+  className?: string;
+};
 
 export function MessageUser({
   hasScrollAnchor,
@@ -51,32 +51,32 @@ export function MessageUser({
   id,
   className,
 }: MessageUserProps) {
-  const [editInput, setEditInput] = useState(children)
-  const [isEditing, setIsEditing] = useState(false)
-  const contentRef = useRef<HTMLDivElement>(null)
+  const [editInput, setEditInput] = useState(children);
+  const [isEditing, setIsEditing] = useState(false);
+  const contentRef = useRef<HTMLDivElement>(null);
 
   const handleEditCancel = () => {
-    setIsEditing(false)
-    setEditInput(children)
-  }
+    setIsEditing(false);
+    setEditInput(children);
+  };
 
   const handleSave = () => {
     if (onEdit) {
-      onEdit(id, editInput)
+      onEdit(id, editInput);
     }
-    onReload()
-    setIsEditing(false)
-  }
+    onReload();
+    setIsEditing(false);
+  };
 
   const handleDelete = () => {
-    onDelete(id)
-  }
+    onDelete(id);
+  };
 
   return (
     <MessageContainer
       className={cn(
-        "group flex w-full max-w-3xl flex-col items-end gap-0.5 px-6 pb-2",
-        hasScrollAnchor && "min-h-scroll-anchor",
+        'group flex w-full max-w-3xl flex-col items-end gap-0.5 px-6 pb-2',
+        hasScrollAnchor && 'min-h-scroll-anchor',
         className
       )}
     >
@@ -85,10 +85,10 @@ export function MessageUser({
           className="flex flex-row gap-2"
           key={`${attachment.name}-${index}`}
         >
-          {attachment.contentType?.startsWith("image") ? (
+          {attachment.contentType?.startsWith('image') ? (
             <MorphingDialog
               transition={{
-                type: "spring",
+                type: 'spring',
                 stiffness: 280,
                 damping: 18,
                 mass: 0.3,
@@ -99,7 +99,7 @@ export function MessageUser({
                   className="mb-1 w-40 rounded-md"
                   key={attachment.name}
                   src={attachment.url}
-                  alt={attachment.name || "Attachment"}
+                  alt={attachment.name || 'Attachment'}
                   width={160}
                   height={120}
                 />
@@ -108,14 +108,14 @@ export function MessageUser({
                 <MorphingDialogContent className="relative rounded-lg">
                   <MorphingDialogImage
                     src={attachment.url}
-                    alt={attachment.name || ""}
+                    alt={attachment.name || ''}
                     className="max-h-[90vh] max-w-[90vw] object-contain"
                   />
                 </MorphingDialogContent>
                 <MorphingDialogClose className="text-primary" />
               </MorphingDialogContainer>
             </MorphingDialog>
-          ) : attachment.contentType?.startsWith("text") ? (
+          ) : attachment.contentType?.startsWith('text') ? (
             <div className="text-primary mb-3 h-24 w-40 overflow-hidden rounded-md border p-2 text-xs">
               {getTextFromDataUrl(attachment.url)}
             </div>
@@ -134,12 +134,12 @@ export function MessageUser({
             value={editInput}
             onChange={(e) => setEditInput(e.target.value)}
             onKeyDown={(e) => {
-              if (e.key === "Enter" && !e.shiftKey) {
-                e.preventDefault()
-                handleSave()
+              if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                handleSave();
               }
-              if (e.key === "Escape") {
-                handleEditCancel()
+              if (e.key === 'Escape') {
+                handleEditCancel();
               }
             }}
             autoFocus
@@ -177,7 +177,7 @@ export function MessageUser({
         </MessageContent>
       )}
       <MessageActions className="flex gap-0 opacity-0 transition-opacity duration-0 group-hover:opacity-100">
-        <MessageAction tooltip={copied ? "Copied!" : "Copy text"} side="bottom">
+        <MessageAction tooltip={copied ? 'Copied!' : 'Copy text'} side="bottom">
           <button
             className="hover:bg-accent/60 text-muted-foreground hover:text-foreground flex size-7.5 items-center justify-center rounded-full bg-transparent transition"
             aria-label="Copy text"
@@ -218,5 +218,5 @@ export function MessageUser({
         </MessageAction>
       </MessageActions>
     </MessageContainer>
-  )
+  );
 }

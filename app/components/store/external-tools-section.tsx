@@ -24,6 +24,14 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { useExternalAITools } from '@/lib/external-ai-tools-store/provider';
 import { ExternalAITool } from '@/lib/external-ai-tools-store/types';
 import { useUser } from '@/lib/user-store/provider';
+import { useCategories } from '@/lib/categories-store/provider';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import {
   DotsThreeVertical,
   LinkSimple,
@@ -63,6 +71,8 @@ export function ExternalToolsSection({ toolId }: ExternalToolsSectionProps) {
     setShowMyToolsOnly,
   } = useExternalAITools();
   const { user } = useUser();
+  const { categories } = useCategories();
+  const [selectedCategoryId, setSelectedCategoryId] = useState<string>('all');
 
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingTool, setEditingTool] = useState<ExternalAITool | null>(null);
@@ -78,9 +88,18 @@ export function ExternalToolsSection({ toolId }: ExternalToolsSectionProps) {
   // Handle load more
   const handleLoadMore = useCallback(async () => {
     if (!pagination?.hasNext || isLoading || isLoadingMore) return;
-
-    await loadMoreTools();
-  }, [pagination, loadMoreTools, isLoading, isLoadingMore]);
+    await loadMoreTools({
+      category: selectedCategoryId !== 'all' ? selectedCategoryId : undefined,
+      search: searchQuery || undefined,
+    });
+  }, [
+    pagination,
+    loadMoreTools,
+    isLoading,
+    isLoadingMore,
+    selectedCategoryId,
+    searchQuery,
+  ]);
 
   // Infinite scroll hook - completely isolated
   const infiniteScrollRef = useInfiniteScrollIsolated({
@@ -94,8 +113,9 @@ export function ExternalToolsSection({ toolId }: ExternalToolsSectionProps) {
     refreshTools({
       page: 1,
       search: searchQuery,
+      category: selectedCategoryId !== 'all' ? selectedCategoryId : undefined,
     });
-  }, [refreshTools, searchQuery]);
+  }, [refreshTools, searchQuery, selectedCategoryId]);
 
   // Reset tool redirect processing when toolId changes
   useEffect(() => {
@@ -278,8 +298,8 @@ export function ExternalToolsSection({ toolId }: ExternalToolsSectionProps) {
 
           {/* Search and Filter */}
           <div className="mb-8 space-y-4">
-            <div className="flex items-center gap-4">
-              <div className="relative flex-1 max-w-md">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
+              <div className="relative w-full sm:max-w-md sm:flex-1">
                 <MagnifyingGlass className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 transform" />
                 <Input
                   placeholder="Search external AI tools..."
@@ -298,10 +318,36 @@ export function ExternalToolsSection({ toolId }: ExternalToolsSectionProps) {
                   </Button>
                 )}
               </div>
+              {/* Category dropdown */}
+              <div className="w-48">
+                <Select
+                  value={selectedCategoryId}
+                  onValueChange={async (value) => {
+                    setSelectedCategoryId(value);
+                    await refreshTools({
+                      page: 1,
+                      search: searchQuery,
+                      category: value !== 'all' ? value : undefined,
+                    });
+                  }}
+                >
+                  <SelectTrigger className="h-10">
+                    <SelectValue placeholder="All categories" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All categories</SelectItem>
+                    {categories.map((category) => (
+                      <SelectItem key={category.id} value={category.id}>
+                        {category.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
 
-              {/* Filter Toggle */}
+              {/* Filter Toggle at far right */}
               {user && (
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 ml-auto">
                   <Switch
                     id="my-tools-filter"
                     checked={showMyToolsOnly}

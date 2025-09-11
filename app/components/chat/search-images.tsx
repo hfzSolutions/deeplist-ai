@@ -1,27 +1,29 @@
-import Image from "next/image"
-import { useState } from "react"
-import { addUTM, getFavicon, getSiteName } from "./utils"
+import Image from 'next/image';
+import { useState } from 'react';
+import { addUTM, getFavicon, getSiteName } from './utils';
 
 type ImageResult = {
-  title: string
-  imageUrl: string
-  sourceUrl: string
-}
+  title: string;
+  imageUrl: string;
+  sourceUrl: string;
+};
 
 export function SearchImages({ results }: { results: ImageResult[] }) {
-  const [hiddenIndexes, setHiddenIndexes] = useState<Set<number>>(new Set())
+  const [hiddenIndexes, setHiddenIndexes] = useState<Set<number>>(new Set());
 
   const handleError = (index: number) => {
-    setHiddenIndexes((prev) => new Set(prev).add(index))
-  }
+    setHiddenIndexes((prev) => new Set(prev).add(index));
+  };
 
-  if (!results?.length) return null
+  if (!results?.length) return null;
 
   return (
     <div className="my-4 grid grid-cols-1 gap-4 sm:grid-cols-3">
       {results.map((img, i) => {
-        const favicon = getFavicon(img.sourceUrl)
-        return hiddenIndexes.has(i) ? null : (
+        const favicon = getFavicon(img.sourceUrl);
+        const hasValidImageUrl = Boolean(img.imageUrl && img.imageUrl.trim());
+        if (hiddenIndexes.has(i) || !hasValidImageUrl) return null;
+        return (
           <a
             key={i}
             href={addUTM(img.sourceUrl)}
@@ -33,7 +35,9 @@ export function SearchImages({ results }: { results: ImageResult[] }) {
               src={img.imageUrl}
               alt={img.title}
               onError={() => handleError(i)}
-              onLoad={(e) => e.currentTarget.classList.remove("opacity-0")}
+              onLoad={(e) => e.currentTarget.classList.remove('opacity-0')}
+              width={600}
+              height={400}
               className="h-full max-h-48 min-h-40 w-full object-cover opacity-0 transition-opacity duration-150 ease-out"
             />
             <div className="bg-primary absolute right-0 bottom-0 left-0 flex flex-col gap-0.5 px-2.5 py-1.5 opacity-0 transition-opacity duration-100 ease-out group-hover/image:opacity-100">
@@ -42,6 +46,8 @@ export function SearchImages({ results }: { results: ImageResult[] }) {
                   <Image
                     src={favicon}
                     alt="favicon"
+                    width={16}
+                    height={16}
                     className="h-4 w-4 rounded-full"
                   />
                 )}
@@ -54,8 +60,8 @@ export function SearchImages({ results }: { results: ImageResult[] }) {
               </span>
             </div>
           </a>
-        )
+        );
       })}
     </div>
-  )
+  );
 }

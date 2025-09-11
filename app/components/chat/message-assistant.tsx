@@ -107,7 +107,7 @@ export function MessageAssistant({
         {reasoningParts && reasoningParts.reasoning && (
           <Reasoning
             reasoning={reasoningParts.reasoning}
-            isStreaming={status === 'streaming'}
+            isStreaming={status === 'streaming' && isLast}
           />
         )}
 

@@ -180,10 +180,6 @@ export function ChatInput({
                   if (agentId) {
                     const agent = agents.find((a) => a.id === agentId);
                     setSelectedAgent(agent || null);
-                    // Update model to agent's model if agent has one
-                    if (agent?.model) {
-                      onSelectModel(agent.model);
-                    }
                   } else {
                     setSelectedAgent(null);
                   }

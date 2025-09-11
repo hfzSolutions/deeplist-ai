@@ -132,6 +132,10 @@ export function useChatCore({
     onError: handleError,
   });
 
+  // UI status: show 'submitted' immediately after we enqueue the optimistic user message
+  // so the typing indicator appears while preflight (limits, chat ensure, uploads) run.
+  const [uiIsSubmitted, setUiIsSubmitted] = useState(false);
+
   // Transform messages to include agent data for agent messages
   const messages = useMemo(() => {
     return rawMessages.map((message) => {
@@ -212,6 +216,8 @@ export function useChatCore({
     };
 
     setMessages((prev) => [...prev, optimisticMessage]);
+    // Trigger loader early
+    setUiIsSubmitted(true);
     setInput('');
 
     const submittedFiles = [...files];
@@ -288,6 +294,9 @@ export function useChatCore({
       toast({ title: 'Failed to send message', status: 'error' });
     } finally {
       setIsSubmitting(false);
+      // When streaming starts, status will change to 'streaming'; when ready, reset UI submitted
+      // Safety timeout reset in case of early errors handled above
+      setTimeout(() => setUiIsSubmitted(false), 0);
     }
   }, [
     user,
@@ -313,6 +322,11 @@ export function useChatCore({
     setIsSubmitting,
     router,
   ]);
+
+  // Derive status for UI: prefer actual status, but if it's 'ready' while we're preflighting,
+  // expose 'submitted' so the loader renders without waiting for network response.
+  const derivedStatus =
+    uiIsSubmitted && status === 'ready' ? 'submitted' : status;
 
   // Handle suggestion
   const handleSuggestion = useCallback(
@@ -451,7 +465,7 @@ export function useChatCore({
     messages,
     input,
     handleSubmit,
-    status,
+    status: derivedStatus,
     error,
     reload,
     stop,
