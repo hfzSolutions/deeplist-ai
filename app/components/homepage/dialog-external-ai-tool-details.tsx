@@ -202,18 +202,6 @@ export function DialogExternalAIToolDetails({
             <span className="text-sm">{formatDate(tool.created_at)}</span>
           </div>
         </div>
-
-        {/* Featured Status */}
-        <div className="space-y-3">
-          <h3 className="text-muted-foreground text-sm font-medium tracking-wide uppercase">
-            Status
-          </h3>
-          <div className="flex items-center gap-2">
-            <span className="text-sm">
-              {tool.featured ? 'Featured Tool' : 'Standard Tool'}
-            </span>
-          </div>
-        </div>
       </div>
 
       {/* Website Section */}

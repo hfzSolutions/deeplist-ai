@@ -26,6 +26,7 @@ export interface PaginationParams {
   limit?: number;
   search?: string;
   tags?: string;
+  category?: string;
 }
 
 export interface PaginatedResponse<T> {

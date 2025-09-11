@@ -43,6 +43,7 @@ export function ExternalAIToolsProvider({
       if (params?.limit) searchParams.set('limit', params.limit.toString());
       if (params?.search) searchParams.set('search', params.search);
       if (params?.tags) searchParams.set('tags', params.tags);
+      if (params?.category) searchParams.set('category', params.category);
 
       const response = await fetch(`/api/external-ai-tools?${searchParams}`);
 
@@ -233,6 +234,7 @@ export function ExternalAIToolsProvider({
         searchParams.set('limit', pagination.limit.toString());
         if (params?.search) searchParams.set('search', params.search);
         if (params?.tags) searchParams.set('tags', params.tags);
+        if (params?.category) searchParams.set('category', params.category);
 
         const response = await fetch(`/api/external-ai-tools?${searchParams}`);
 

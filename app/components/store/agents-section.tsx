@@ -43,6 +43,14 @@ import { useInfiniteScrollIsolated } from '@/app/hooks/use-infinite-scroll-isola
 import { DialogCreateAgent } from '../layout/sidebar/dialog-create-agent';
 import { DialogAgentDetails } from '../homepage/dialog-agent-details';
 import { TerminologyHelper, AnnouncementBanner } from '../transition';
+import { useCategories } from '@/lib/categories-store/provider';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
 interface AgentsSectionProps {
   onCreateAgent: () => void;
@@ -103,6 +111,8 @@ export function AgentsSection({
   } = useAgents();
   const { user } = useUser();
   const [searchQuery, setSearchQuery] = useState('');
+  const { categories } = useCategories();
+  const [selectedCategoryId, setSelectedCategoryId] = useState<string>('all');
 
   // Filter to show only public agents
   const publicAgents = agents.filter((agent) => agent.is_public);
@@ -136,13 +146,20 @@ export function AgentsSection({
   const handleSearch = useCallback(
     async (query: string) => {
       setSearchQuery(query);
+      const categoryParam =
+        selectedCategoryId !== 'all' ? selectedCategoryId : undefined;
       if (query.trim()) {
-        await refreshAgents({ page: 1, limit: 20, search: query.trim() });
+        await refreshAgents({
+          page: 1,
+          limit: 20,
+          search: query.trim(),
+          category: categoryParam,
+        });
       } else {
-        await refreshAgents({ page: 1, limit: 20 });
+        await refreshAgents({ page: 1, limit: 20, category: categoryParam });
       }
     },
-    [refreshAgents]
+    [refreshAgents, selectedCategoryId]
   );
 
   // Handle load more
@@ -156,9 +173,18 @@ export function AgentsSection({
     });
 
     if (!pagination?.hasNext || isLoading || isLoadingMore) return;
-
-    await loadMoreAgents();
-  }, [pagination, loadMoreAgents, isLoading, isLoadingMore]);
+    await loadMoreAgents({
+      category: selectedCategoryId !== 'all' ? selectedCategoryId : undefined,
+      search: searchQuery.trim() ? searchQuery.trim() : undefined,
+    });
+  }, [
+    pagination,
+    loadMoreAgents,
+    isLoading,
+    isLoadingMore,
+    selectedCategoryId,
+    searchQuery,
+  ]);
 
   // Handle toggle changes
   const handleMyAgentsToggle = (checked: boolean) => {
@@ -225,8 +251,9 @@ export function AgentsSection({
 
           {/* Search and Filter */}
           <div className="mb-8 space-y-4">
-            <div className="flex items-center gap-4">
-              <div className="relative flex-1 max-w-md">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
+              {/* Search - full width on small screens */}
+              <div className="relative w-full sm:max-w-md sm:flex-1">
                 <MagnifyingGlass className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 transform" />
                 <Input
                   placeholder="Search agents..."
@@ -246,9 +273,39 @@ export function AgentsSection({
                 )}
               </div>
 
-              {/* Filter Toggles */}
+              {/* Category dropdown */}
+              <div className="w-48">
+                <Select
+                  value={selectedCategoryId}
+                  onValueChange={async (value) => {
+                    setSelectedCategoryId(value);
+                    await refreshAgents({
+                      page: 1,
+                      limit: 20,
+                      category: value !== 'all' ? value : undefined,
+                      search: searchQuery.trim()
+                        ? searchQuery.trim()
+                        : undefined,
+                    });
+                  }}
+                >
+                  <SelectTrigger className="h-10">
+                    <SelectValue placeholder="All categories" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All categories</SelectItem>
+                    {categories.map((category) => (
+                      <SelectItem key={category.id} value={category.id}>
+                        {category.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Filter Toggles at the far right */}
               {user && (
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-4 ml-auto">
                   <div className="flex items-center gap-2">
                     <Switch
                       id="my-agents-filter"
