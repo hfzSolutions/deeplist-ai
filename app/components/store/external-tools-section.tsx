@@ -129,7 +129,6 @@ export function ExternalToolsSection({ toolId }: ExternalToolsSectionProps) {
 
       // First try to find the tool in the current tools list
       let tool = tools.find((t) => t.id === toolId);
-      let errorHandled = false;
 
       // If not found and tools are loaded, try to fetch it from the public API
       if (!tool && !isLoading) {
@@ -145,7 +144,6 @@ export function ExternalToolsSection({ toolId }: ExternalToolsSectionProps) {
             toast.error(
               'AI tool not found. The link may be outdated or the tool may have been removed.'
             );
-            errorHandled = true;
             setToolRedirectProcessed(true);
             const url = new URL(window.location.href);
             url.searchParams.delete('tool');
@@ -156,7 +154,6 @@ export function ExternalToolsSection({ toolId }: ExternalToolsSectionProps) {
             toast.error(
               'Failed to load AI tool details. Please try again later.'
             );
-            errorHandled = true;
             setToolRedirectProcessed(true);
             const url = new URL(window.location.href);
             url.searchParams.delete('tool');
@@ -168,7 +165,6 @@ export function ExternalToolsSection({ toolId }: ExternalToolsSectionProps) {
           toast.error(
             'Failed to load AI tool details. Please check your connection and try again.'
           );
-          errorHandled = true;
           setToolRedirectProcessed(true);
           const url = new URL(window.location.href);
           url.searchParams.delete('tool');
@@ -185,7 +181,7 @@ export function ExternalToolsSection({ toolId }: ExternalToolsSectionProps) {
         const url = new URL(window.location.href);
         url.searchParams.delete('tool');
         window.history.replaceState({}, '', url.toString());
-      } else if (!isLoading && !errorHandled) {
+      } else if (!isLoading) {
         // Tool not found in local list and no API call was made
         toast.error(
           'AI tool not found. The link may be outdated or the tool may have been removed.'
@@ -198,7 +194,7 @@ export function ExternalToolsSection({ toolId }: ExternalToolsSectionProps) {
     };
 
     handleToolRedirect();
-  }, [toolId, tools, isLoading, toolRedirectProcessed]);
+  }, [toolId, toolRedirectProcessed]);
 
   const handleLoginPrompt = (action: string) => {
     setLoginPromptAction(action);
