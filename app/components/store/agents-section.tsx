@@ -240,14 +240,6 @@ export function AgentsSection({
 
   // Handle load more
   const handleLoadMore = useCallback(async () => {
-    console.log('handleLoadMore called:', {
-      hasNext: pagination?.hasNext,
-      isLoading,
-      isLoadingMore,
-      currentPage: pagination?.page,
-      totalPages: pagination?.totalPages,
-    });
-
     if (!pagination?.hasNext || isLoading || isLoadingMore) return;
     await loadMoreAgents({
       category: selectedCategoryId !== 'all' ? selectedCategoryId : undefined,
