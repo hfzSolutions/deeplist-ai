@@ -58,7 +58,7 @@ export function UserProvider({
 
     // Optimistically update the local state immediately
     setUser((prev) => (prev ? { ...prev, ...updates } : null));
-    
+
     // Update the database in the background
     try {
       await updateUserProfile(user.id, updates);
@@ -68,7 +68,7 @@ export function UserProvider({
       setUser((prev) => {
         if (!prev) return null;
         const reverted = { ...prev };
-        Object.keys(updates).forEach(key => {
+        Object.keys(updates).forEach((key) => {
           delete reverted[key as keyof UserProfile];
         });
         return reverted;

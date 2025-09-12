@@ -272,15 +272,6 @@ export function AgentProvider({ children }: { children: React.ReactNode }) {
 
   const loadMoreAgents = useCallback(
     async (params?: PaginationParams) => {
-      console.log('loadMoreAgents called:', {
-        hasNext: pagination?.hasNext,
-        isLoading,
-        isLoadingMore,
-        currentPage: pagination?.page,
-        totalPages: pagination?.totalPages,
-        currentAgentsCount: agents.length,
-      });
-
       if (!pagination?.hasNext || isLoading || isLoadingMore) return;
 
       setIsLoadingMore(true);
@@ -294,8 +285,6 @@ export function AgentProvider({ children }: { children: React.ReactNode }) {
         if (params?.tags) searchParams.set('tags', params.tags);
         if (params?.category) searchParams.set('category', params.category);
 
-        console.log('Loading more agents from page:', nextPage);
-
         const response = await fetchClient(
           `/api/agents?${searchParams.toString()}`
         );
@@ -304,15 +293,13 @@ export function AgentProvider({ children }: { children: React.ReactNode }) {
           const data = await response.json();
           const newAgents = data.agents || [];
 
-          console.log('Received new agents:', newAgents.length);
-
           // Filter out any agents that already exist to prevent duplicates
           setAgents((prev) => {
             const existingIds = new Set(prev.map((agent) => agent.id));
             const uniqueNewAgents = newAgents.filter(
               (agent: any) => !existingIds.has(agent.id)
             );
-            console.log('Adding unique new agents:', uniqueNewAgents.length);
+
             return [...prev, ...uniqueNewAgents];
           });
 
