@@ -37,10 +37,14 @@ export function StoreContainer() {
   // Check URL parameters and update view accordingly
   useEffect(() => {
     const toolParam = searchParams.get('tool');
+    const agentParam = searchParams.get('agent');
 
     if (toolParam) {
       // If there's a tool parameter, switch to external tools tab
       setActiveTab('external');
+    } else if (agentParam) {
+      // If there's an agent parameter, switch to agents tab
+      setActiveTab('agents');
     }
   }, [searchParams]);
 
@@ -218,6 +222,7 @@ export function StoreContainer() {
         <TabsContent value="agents" className="mt-0 flex flex-1 flex-col">
           <AnnouncementBanner />
           <AgentsSection
+            agentId={searchParams.get('agent')}
             onCreateAgent={handleCreateAgent}
             onEditAgent={handleEditAgent}
             onDeleteAgent={handleDeleteAgent}

@@ -53,6 +53,7 @@ import {
 } from '@/components/ui/select';
 
 interface AgentsSectionProps {
+  agentId?: string | null;
   onCreateAgent: () => void;
   onEditAgent: (agent: Agent) => void;
   onDeleteAgent: (agent: Agent) => void;
@@ -75,6 +76,7 @@ interface AgentsSectionProps {
 }
 
 export function AgentsSection({
+  agentId,
   onCreateAgent,
   onEditAgent,
   onDeleteAgent,
@@ -113,6 +115,7 @@ export function AgentsSection({
   const [searchQuery, setSearchQuery] = useState('');
   const { categories } = useCategories();
   const [selectedCategoryId, setSelectedCategoryId] = useState<string>('all');
+  const [agentRedirectProcessed, setAgentRedirectProcessed] = useState(false);
 
   // Filter to show only public agents
   const publicAgents = agents.filter((agent) => agent.is_public);
@@ -161,6 +164,79 @@ export function AgentsSection({
     },
     [refreshAgents, selectedCategoryId]
   );
+
+  // Reset agent redirect processed when agentId changes
+  useEffect(() => {
+    setAgentRedirectProcessed(false);
+  }, [agentId]);
+
+  // Handle automatic agent details dialog opening when agentId is provided
+  useEffect(() => {
+    const handleAgentRedirect = async () => {
+      if (!agentId || agentRedirectProcessed) return;
+
+      // First try to find the agent in the current agents list
+      let agent = agents.find((a) => a.id === agentId);
+
+      // If not found and agents are loaded, try to fetch it from the public API
+      if (!agent && !isLoading) {
+        try {
+          const response = await fetch(`/api/agents/public/${agentId}`);
+
+          if (response.ok) {
+            const data = await response.json();
+            agent = data.agent;
+          } else if (response.status === 404) {
+            // Agent not found - show error message and clear URL parameter
+            toast({
+              title: 'Agent not found',
+              description:
+                'The link may be outdated or the agent may have been removed.',
+            });
+            setAgentRedirectProcessed(true);
+            const url = new URL(window.location.href);
+            url.searchParams.delete('agent');
+            window.history.replaceState({}, '', url.toString());
+            return;
+          } else {
+            // Other API errors
+            toast({
+              title: 'Failed to load agent',
+              description: 'Please try again later.',
+            });
+            setAgentRedirectProcessed(true);
+            const url = new URL(window.location.href);
+            url.searchParams.delete('agent');
+            window.history.replaceState({}, '', url.toString());
+            return;
+          }
+        } catch (error) {
+          console.error('Error fetching agent:', error);
+          toast({
+            title: 'Failed to load agent',
+            description: 'Please try again later.',
+          });
+          setAgentRedirectProcessed(true);
+          const url = new URL(window.location.href);
+          url.searchParams.delete('agent');
+          window.history.replaceState({}, '', url.toString());
+          return;
+        }
+      }
+
+      // If we found the agent, open the details dialog
+      if (agent) {
+        onSelectAgent(agent);
+        setAgentRedirectProcessed(true);
+        // Clear the URL parameter after opening the dialog
+        const url = new URL(window.location.href);
+        url.searchParams.delete('agent');
+        window.history.replaceState({}, '', url.toString());
+      }
+    };
+
+    handleAgentRedirect();
+  }, [agentId, agentRedirectProcessed]);
 
   // Handle load more
   const handleLoadMore = useCallback(async () => {
