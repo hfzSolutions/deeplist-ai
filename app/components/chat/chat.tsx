@@ -3,7 +3,6 @@
 import { ChatInput } from '@/app/components/chat-input/chat-input';
 import { Conversation } from '@/app/components/chat/conversation';
 import { useModel } from '@/app/components/chat/use-model';
-import { useChatDraft } from '@/app/hooks/use-chat-draft';
 import { useChats } from '@/lib/chat-store/chats/provider';
 import { useMessages } from '@/lib/chat-store/messages/provider';
 import { useChatSession } from '@/lib/chat-store/session/provider';
@@ -47,7 +46,7 @@ export function Chat() {
   const { messages: initialMessages, cacheAndAddMessage } = useMessages();
   const { user } = useUser();
   const { preferences } = useUserPreferences();
-  const { draftValue, clearDraft } = useChatDraft(chatId);
+  // Draft feature removed
 
   // File upload functionality
   const {
@@ -106,7 +105,6 @@ export function Chat() {
     handleInputChange,
   } = useChatCore({
     initialMessages,
-    draftValue,
     cacheAndAddMessage,
     chatId,
     user,
@@ -118,7 +116,6 @@ export function Chat() {
     ensureChatExists,
     handleFileUploads,
     selectedModel,
-    clearDraft,
     bumpChat,
   });
 

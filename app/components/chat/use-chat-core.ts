@@ -1,4 +1,3 @@
-import { useChatDraft } from '@/app/hooks/use-chat-draft';
 import { toast } from '@/components/ui/toast';
 import { useAgents } from '@/lib/agent-store/provider';
 
@@ -13,7 +12,6 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 type UseChatCoreProps = {
   initialMessages: Message[];
-  draftValue: string;
   cacheAndAddMessage: (message: Message) => void;
   chatId: string | null;
   user: UserProfile | null;
@@ -30,13 +28,11 @@ type UseChatCoreProps = {
     chatId: string
   ) => Promise<Attachment[] | null>;
   selectedModel: string;
-  clearDraft: () => void;
   bumpChat: (chatId: string) => void;
 };
 
 export function useChatCore({
   initialMessages,
-  draftValue,
   cacheAndAddMessage,
   chatId,
   user,
@@ -48,7 +44,6 @@ export function useChatCore({
   ensureChatExists,
   handleFileUploads,
   selectedModel,
-  clearDraft,
   bumpChat,
 }: UseChatCoreProps) {
   // State management
@@ -127,7 +122,7 @@ export function useChatCore({
   } = useChat({
     api: API_ROUTE_CHAT,
     initialMessages,
-    initialInput: draftValue,
+    initialInput: '',
     onFinish: handleFinish,
     onError: handleError,
   });
@@ -283,7 +278,6 @@ export function useChatCore({
       setMessages((prev) => prev.filter((msg) => msg.id !== optimisticId));
       cleanupOptimisticAttachments(optimisticMessage.experimental_attachments);
       cacheAndAddMessage(optimisticMessage);
-      clearDraft();
 
       if (messages.length > 0) {
         bumpChat(currentChatId);
@@ -316,7 +310,6 @@ export function useChatCore({
     enableSearch,
     handleSubmit,
     cacheAndAddMessage,
-    clearDraft,
     messages.length,
     bumpChat,
     setIsSubmitting,
@@ -450,14 +443,12 @@ export function useChatCore({
     router,
   ]);
 
-  // Handle input change - now with access to the real setInput function!
-  const { setDraftValue } = useChatDraft(chatId);
+  // Handle input change - now with access to the real setInput function
   const handleInputChange = useCallback(
     (value: string) => {
       setInput(value);
-      setDraftValue(value);
     },
-    [setInput, setDraftValue]
+    [setInput]
   );
 
   return {
