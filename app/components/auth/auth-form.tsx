@@ -7,7 +7,8 @@ import { Separator } from '@/components/ui/separator';
 import { signInWithEmail, signInWithGoogle, signUpWithEmail } from '@/lib/api';
 import { createClient } from '@/lib/supabase/client';
 import { Eye, EyeSlash } from '@phosphor-icons/react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { ForgotPasswordForm } from './forgot-password-form';
 
 type AuthFormProps = {
@@ -15,6 +16,7 @@ type AuthFormProps = {
 };
 
 export function AuthForm({ onSuccess }: AuthFormProps) {
+  const searchParams = useSearchParams();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isSignUp, setIsSignUp] = useState(false);
@@ -25,6 +27,14 @@ export function AuthForm({ onSuccess }: AuthFormProps) {
     password: '',
     confirmPassword: '',
   });
+
+  // Check if we should start in signup mode
+  useEffect(() => {
+    const mode = searchParams.get('mode');
+    if (mode === 'signup') {
+      setIsSignUp(true);
+    }
+  }, [searchParams]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
