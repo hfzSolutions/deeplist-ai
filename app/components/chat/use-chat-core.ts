@@ -27,7 +27,7 @@ type UseChatCoreProps = {
     uid: string,
     chatId: string
   ) => Promise<Attachment[] | null>;
-  selectedModel: string;
+  selectedModel: string | null;
   bumpChat: (chatId: string) => void;
 };
 
@@ -278,7 +278,7 @@ export function useChatCore({
         body: {
           chatId: currentChatId,
           userId: uid,
-          model: selectedModel,
+          model: selectedModel!,
           isAuthenticated,
           systemPrompt: systemPrompt || SYSTEM_PROMPT_DEFAULT,
           enableSearch,
@@ -385,7 +385,7 @@ export function useChatCore({
           body: {
             chatId: currentChatId,
             userId: uid,
-            model: selectedModel,
+            model: selectedModel!,
             isAuthenticated,
             systemPrompt: SYSTEM_PROMPT_DEFAULT,
             agentId: selectedAgent?.id || null,
@@ -437,7 +437,7 @@ export function useChatCore({
       body: {
         chatId,
         userId: uid,
-        model: selectedModel,
+        model: selectedModel!,
         isAuthenticated,
         systemPrompt: systemPrompt || SYSTEM_PROMPT_DEFAULT,
         agentId: selectedAgent?.id || null,

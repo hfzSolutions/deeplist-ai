@@ -31,7 +31,7 @@ type ChatInputProps = {
   onSuggestion: (suggestion: string) => void;
   hasSuggestions?: boolean;
   onSelectModel: (model: string) => void;
-  selectedModel: string;
+  selectedModel: string | null;
   isUserAuthenticated: boolean;
   stop: () => void;
   status?: 'submitted' | 'streaming' | 'ready' | 'error';
@@ -58,7 +58,7 @@ export function ChatInput({
   enableSearch,
 }: ChatInputProps) {
   const { selectedAgent, setSelectedAgent, agents } = useAgents();
-  const selectModelConfig = getModelInfo(selectedModel);
+  const selectModelConfig = selectedModel ? getModelInfo(selectedModel) : null;
   const hasSearchSupport = Boolean(selectModelConfig?.webSearch);
   const isOnlyWhitespace = (text: string) => !/[^\s]/.test(text);
 
@@ -182,7 +182,7 @@ export function ChatInput({
               <ButtonFileUpload
                 onFileUpload={onFileUpload}
                 isUserAuthenticated={isUserAuthenticated}
-                model={selectedModel}
+                model={selectedModel || ''}
               />
               <AgentSelector
                 selectedAgentId={selectedAgent?.id}
@@ -198,7 +198,7 @@ export function ChatInput({
                 className="rounded-full"
               />
               <ModelSelector
-                selectedModelId={selectedModel}
+                selectedModelId={selectedModel || ''}
                 setSelectedModelId={onSelectModel}
                 isUserAuthenticated={isUserAuthenticated}
                 className="rounded-full"
