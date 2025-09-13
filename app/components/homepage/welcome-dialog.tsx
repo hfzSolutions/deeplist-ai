@@ -70,23 +70,28 @@ export function WelcomeDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
-        <DialogHeader className="text-left">
-          <DialogTitle className="text-2xl font-bold text-foreground mb-2">
-            Welcome to DeepList AI! 👋
-          </DialogTitle>
+      <DialogContent className="sm:max-w-lg">
+        <DialogHeader className="text-left pb-3">
+          <div className="mb-2">
+            <p className="text-sm text-muted-foreground mb-0.5">
+              Welcome to DeepList AI
+            </p>
+            <DialogTitle className="text-2xl font-bold text-foreground">
+              Your AI Customization Platform ✨
+            </DialogTitle>
+          </div>
           <DialogDescription className="text-muted-foreground">
-            Customize your AI experience - build agents, switch instantly, and
-            explore what others have created:
+            Build custom AI agents, switch instantly, and explore what others
+            have created:
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-4">
+        <div className="space-y-6">
           {/* Current Benefit Highlight */}
-          <div className="text-center">
-            <div className="mb-3">
+          <div className="text-center py-4">
+            <div className="mb-6">
               <div
-                className={`inline-flex items-center justify-center w-14 h-14 rounded-full mb-3 ${
+                className={`inline-flex items-center justify-center w-16 h-16 rounded-full mb-4 ${
                   isDark
                     ? 'bg-gradient-to-br from-blue-900/20 to-purple-900/20'
                     : 'bg-gradient-to-br from-blue-50 to-purple-50'
@@ -96,7 +101,7 @@ export function WelcomeDialog({
                   {benefits[currentBenefit].icon}
                 </div>
               </div>
-              <h3 className="text-lg font-semibold text-foreground mb-1">
+              <h3 className="text-lg font-semibold text-foreground mb-2">
                 {benefits[currentBenefit].title}
               </h3>
               <p className="text-sm text-muted-foreground">
@@ -125,7 +130,7 @@ export function WelcomeDialog({
 
         {/* CTA Buttons */}
         <div
-          className={`flex flex-col gap-3 pt-4 border-t ${
+          className={`flex flex-col gap-4 pt-6 border-t ${
             isDark ? 'border-gray-700' : 'border-gray-200'
           }`}
         >
