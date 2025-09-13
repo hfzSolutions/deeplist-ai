@@ -17,9 +17,14 @@ INSERT INTO public.models (name, display_name, provider_id, provider_name, model
 ('openrouter:qwen/qwen-2.5-coder-32b-instruct:free', 'Qwen2.5 Coder 32B Instruct (free)', 'openrouter', 'OpenRouter', 'qwen/qwen-2.5-coder-32b-instruct:free', 32768, null, true, true, false, ARRAY['chat'], 'Qwen2.5-Coder brings significant improvements in code generation and reasoning.', 9),
 ('openrouter:google/gemini-2.0-flash-exp:free', 'Google: Gemini 2.0 Flash Experimental (free)', 'openrouter', 'OpenRouter', 'google/gemini-2.0-flash-exp:free', 1048576, 8192, true, true, false, ARRAY['chat', 'vision', 'tools'], 'Gemini Flash 2.0 offers significantly faster time to first token with multimodal capabilities.', 10);
 
--- Update default model setting to use DeepSeek R1 free model
-INSERT INTO public.app_settings (key, value, description)
-VALUES ('default_model', '"openrouter:deepseek/deepseek-r1:free"', 'Default model for new chats')
-ON CONFLICT (key) DO UPDATE SET
-  value = EXCLUDED.value,
-  updated_at = NOW();
+-- Set DeepSeek R1 free model as default using is_default field
+UPDATE public.models 
+SET is_default = true 
+WHERE model_id = 'deepseek/deepseek-r1:free' 
+AND is_enabled = true;
+
+-- Ensure only one model is marked as default
+UPDATE public.models 
+SET is_default = false 
+WHERE model_id != 'deepseek/deepseek-r1:free' 
+OR is_enabled = false;

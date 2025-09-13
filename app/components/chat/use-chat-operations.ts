@@ -10,7 +10,7 @@ type UseChatOperationsProps = {
   isAuthenticated: boolean;
   chatId: string | null;
   messages: Message[];
-  selectedModel: string;
+  selectedModel: string | null;
   systemPrompt: string;
   createNewChat: (
     userId: string,
@@ -97,7 +97,7 @@ export function useChatOperations({
         const newChat = await createNewChat(
           userId,
           input,
-          selectedModel,
+          selectedModel || undefined,
           isAuthenticated,
           systemPrompt
         );

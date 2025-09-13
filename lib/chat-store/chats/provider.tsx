@@ -1,11 +1,11 @@
-"use client"
+'use client';
 
-import { toast } from "@/components/ui/toast"
-import { createContext, useContext, useEffect, useState } from "react"
-import { SYSTEM_PROMPT_DEFAULT } from "../../config"
-import { writeToIndexedDB } from "../persist"
+import { toast } from '@/components/ui/toast';
+import { createContext, useContext, useEffect, useState } from 'react';
+import { SYSTEM_PROMPT_DEFAULT } from '../../config';
+import { writeToIndexedDB } from '../persist';
 // Default model is now fetched from API endpoint
-import type { Chats } from "../types"
+import type { Chats } from '../types';
 import {
   createNewChat as createNewChatFromDb,
   deleteChat as deleteChatFromDb,
@@ -13,19 +13,19 @@ import {
   getCachedChats,
   updateChatModel as updateChatModelFromDb,
   updateChatTitle,
-} from "./api"
+} from './api';
 
 interface ChatsContextType {
-  chats: Chats[]
-  refresh: () => Promise<void>
-  isLoading: boolean
-  updateTitle: (id: string, title: string) => Promise<void>
+  chats: Chats[];
+  refresh: () => Promise<void>;
+  isLoading: boolean;
+  updateTitle: (id: string, title: string) => Promise<void>;
   deleteChat: (
     id: string,
     currentChatId?: string,
     redirect?: () => void
-  ) => Promise<void>
-  setChats: React.Dispatch<React.SetStateAction<Chats[]>>
+  ) => Promise<void>;
+  setChats: React.Dispatch<React.SetStateAction<Chats[]>>;
   createNewChat: (
     userId: string,
     title?: string,
@@ -33,89 +33,89 @@ interface ChatsContextType {
     isAuthenticated?: boolean,
     systemPrompt?: string,
     projectId?: string
-  ) => Promise<Chats | undefined>
-  resetChats: () => Promise<void>
-  getChatById: (id: string) => Chats | undefined
-  updateChatModel: (id: string, model: string) => Promise<void>
-  bumpChat: (id: string) => Promise<void>
+  ) => Promise<Chats | undefined>;
+  resetChats: () => Promise<void>;
+  getChatById: (id: string) => Chats | undefined;
+  updateChatModel: (id: string, model: string) => Promise<void>;
+  bumpChat: (id: string) => Promise<void>;
 }
-const ChatsContext = createContext<ChatsContextType | null>(null)
+const ChatsContext = createContext<ChatsContextType | null>(null);
 
 export function useChats() {
-  const context = useContext(ChatsContext)
-  if (!context) throw new Error("useChats must be used within ChatsProvider")
-  return context
+  const context = useContext(ChatsContext);
+  if (!context) throw new Error('useChats must be used within ChatsProvider');
+  return context;
 }
 
 export function ChatsProvider({
   userId,
   children,
 }: {
-  userId?: string
-  children: React.ReactNode
+  userId?: string;
+  children: React.ReactNode;
 }) {
-  const [isLoading, setIsLoading] = useState(true)
-  const [chats, setChats] = useState<Chats[]>([])
+  const [isLoading, setIsLoading] = useState(true);
+  const [chats, setChats] = useState<Chats[]>([]);
 
   useEffect(() => {
-    if (!userId) return
+    if (!userId) return;
 
     const load = async () => {
-      setIsLoading(true)
-      const cached = await getCachedChats()
-      setChats(cached)
+      setIsLoading(true);
+      const cached = await getCachedChats();
+      setChats(cached);
 
       try {
-        const fresh = await fetchAndCacheChats(userId)
-        setChats(fresh)
+        const fresh = await fetchAndCacheChats(userId);
+        setChats(fresh);
       } finally {
-        setIsLoading(false)
+        setIsLoading(false);
       }
-    }
+    };
 
-    load()
-  }, [userId])
+    load();
+  }, [userId]);
 
   const refresh = async () => {
-    if (!userId) return
+    if (!userId) return;
 
-    const fresh = await fetchAndCacheChats(userId)
-    setChats(fresh)
-  }
+    const fresh = await fetchAndCacheChats(userId);
+    setChats(fresh);
+  };
 
   const updateTitle = async (id: string, title: string) => {
-    const prev = [...chats]
+    const prev = [...chats];
     const updatedChatWithNewTitle = prev.map((c) =>
       c.id === id ? { ...c, title, updated_at: new Date().toISOString() } : c
-    )
+    );
     const sorted = updatedChatWithNewTitle.sort(
-      (a, b) => +new Date(b.updated_at || "") - +new Date(a.updated_at || "")
-    )
-    setChats(sorted)
+      (a, b) => +new Date(b.updated_at || '') - +new Date(a.updated_at || '')
+    );
+    setChats(sorted);
     try {
-      await updateChatTitle(id, title)
+      await updateChatTitle(id, title);
     } catch {
-      setChats(prev)
-      toast({ title: "Failed to update title", status: "error" })
+      setChats(prev);
+      toast({ title: 'Failed to update title', status: 'error' });
     }
-  }
+  };
 
   const deleteChat = async (
     id: string,
     currentChatId?: string,
     redirect?: () => void
   ) => {
-    const prev = [...chats]
-    setChats((prev) => prev.filter((c) => c.id !== id))
+    const prev = [...chats];
+    setChats((prev) => prev.filter((c) => c.id !== id));
 
     try {
-      await deleteChatFromDb(id)
-      if (id === currentChatId && redirect) redirect()
+      await deleteChatFromDb(id);
+      if (id === currentChatId && redirect) redirect();
     } catch {
-      setChats(prev)
-      toast({ title: "Failed to delete chat", status: "error" })
+      setChats(prev);
+      toast({ title: 'Failed to delete chat', status: 'error' });
     }
-  }
+  };
 
   const createNewChat = async (
     userId: string,
@@ -125,31 +125,33 @@ export function ChatsProvider({
     systemPrompt?: string,
     projectId?: string
   ) => {
-    if (!userId) return
-    const prev = [...chats]
+    if (!userId) return;
+    const prev = [...chats];
 
     // Get default model from API
-    let defaultModel = "openrouter:deepseek/deepseek-r1:free"
+    let defaultModel: string | null = null;
     try {
-      const response = await fetch('/api/model-config')
-      const data = await response.json()
-      defaultModel = data.defaultModel || defaultModel
-    } catch {
-      // Use fallback if API fails
+      const response = await fetch('/api/model-config');
+      const data = await response.json();
+      if (data.defaultModel) {
+        defaultModel = data.defaultModel;
+      }
+    } catch (error) {
+      console.error('Failed to fetch default model:', error);
     }
-    const optimisticId = `optimistic-${Date.now().toString()}`
+    const optimisticId = `optimistic-${Date.now().toString()}`;
     const optimisticChat = {
       id: optimisticId,
-      title: title || "New Chat",
+      title: title || 'New Chat',
       created_at: new Date().toISOString(),
-      model: model || defaultModel,
+      model: model || defaultModel || 'none',
       system_prompt: systemPrompt || SYSTEM_PROMPT_DEFAULT,
       user_id: userId,
       public: true,
       updated_at: new Date().toISOString(),
       project_id: null,
-    }
-    setChats((prev) => [optimisticChat, ...prev])
+    };
+    setChats((prev) => [optimisticChat, ...prev]);
 
     try {
       const newChat = await createNewChatFromDb(
@@ -158,59 +160,59 @@ export function ChatsProvider({
         model,
         isAuthenticated,
         projectId
-      )
+      );
 
       setChats((prev) => [
         newChat,
         ...prev.filter((c) => c.id !== optimisticId),
-      ])
+      ]);
 
-      return newChat
+      return newChat;
     } catch {
-      setChats(prev)
-      toast({ title: "Failed to create chat", status: "error" })
+      setChats(prev);
+      toast({ title: 'Failed to create chat', status: 'error' });
     }
-  }
+  };
 
   const resetChats = async () => {
     try {
-      setChats([])
+      setChats([]);
       // Clear cached chats from IndexedDB
-      await writeToIndexedDB("chats", [])
-      console.log('Chats reset and cache cleared successfully')
+      await writeToIndexedDB('chats', []);
+      console.log('Chats reset and cache cleared successfully');
     } catch (error) {
-      console.error('Error resetting chats:', error)
+      console.error('Error resetting chats:', error);
       // Still clear the state even if cache clearing fails
-      setChats([])
+      setChats([]);
     }
-  }
+  };
 
   const getChatById = (id: string) => {
-    const chat = chats.find((c) => c.id === id)
-    return chat
-  }
+    const chat = chats.find((c) => c.id === id);
+    return chat;
+  };
 
   const updateChatModel = async (id: string, model: string) => {
-    const prev = [...chats]
-    setChats((prev) => prev.map((c) => (c.id === id ? { ...c, model } : c)))
+    const prev = [...chats];
+    setChats((prev) => prev.map((c) => (c.id === id ? { ...c, model } : c)));
     try {
-      await updateChatModelFromDb(id, model)
+      await updateChatModelFromDb(id, model);
     } catch {
-      setChats(prev)
-      toast({ title: "Failed to update model", status: "error" })
+      setChats(prev);
+      toast({ title: 'Failed to update model', status: 'error' });
     }
-  }
+  };
 
   const bumpChat = async (id: string) => {
-    const prev = [...chats]
+    const prev = [...chats];
     const updatedChatWithNewUpdatedAt = prev.map((c) =>
       c.id === id ? { ...c, updated_at: new Date().toISOString() } : c
-    )
+    );
     const sorted = updatedChatWithNewUpdatedAt.sort(
-      (a, b) => +new Date(b.updated_at || "") - +new Date(a.updated_at || "")
-    )
-    setChats(sorted)
-  }
+      (a, b) => +new Date(b.updated_at || '') - +new Date(a.updated_at || '')
+    );
+    setChats(sorted);
+  };
 
   return (
     <ChatsContext.Provider
@@ -230,5 +232,5 @@ export function ChatsProvider({
     >
       {children}
     </ChatsContext.Provider>
-  )
+  );
 }

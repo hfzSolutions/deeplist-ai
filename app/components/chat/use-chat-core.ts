@@ -27,7 +27,7 @@ type UseChatCoreProps = {
     uid: string,
     chatId: string
   ) => Promise<Attachment[] | null>;
-  selectedModel: string;
+  selectedModel: string | null;
   bumpChat: (chatId: string) => void;
 };
 
@@ -162,14 +162,16 @@ export function useChatCore({
   }, [prompt, setInput]);
 
   // Reset messages when navigating from a chat to home
-  if (
-    prevChatIdRef.current !== null &&
-    chatId === null &&
-    messages.length > 0
-  ) {
-    setMessages([]);
-  }
-  prevChatIdRef.current = chatId;
+  useEffect(() => {
+    if (
+      prevChatIdRef.current !== null &&
+      chatId === null &&
+      messages.length > 0
+    ) {
+      setMessages([]);
+    }
+    prevChatIdRef.current = chatId;
+  }, [chatId, messages.length, setMessages]);
 
   // Submit action
   const submit = useCallback(async () => {
@@ -180,6 +182,17 @@ export function useChatCore({
         window.location.pathname + window.location.search
       );
       router.push(`/auth?returnUrl=${returnUrl}`);
+      setIsSubmitting(false);
+      return;
+    }
+
+    // Check if a model is selected
+    if (!selectedModel) {
+      toast({
+        title: 'No model selected',
+        description: 'Please select a model before sending a message.',
+        status: 'error',
+      });
       setIsSubmitting(false);
       return;
     }
@@ -265,7 +278,7 @@ export function useChatCore({
         body: {
           chatId: currentChatId,
           userId: uid,
-          model: selectedModel,
+          model: selectedModel!,
           isAuthenticated,
           systemPrompt: systemPrompt || SYSTEM_PROMPT_DEFAULT,
           enableSearch,
@@ -372,7 +385,7 @@ export function useChatCore({
           body: {
             chatId: currentChatId,
             userId: uid,
-            model: selectedModel,
+            model: selectedModel!,
             isAuthenticated,
             systemPrompt: SYSTEM_PROMPT_DEFAULT,
             agentId: selectedAgent?.id || null,
@@ -424,7 +437,7 @@ export function useChatCore({
       body: {
         chatId,
         userId: uid,
-        model: selectedModel,
+        model: selectedModel!,
         isAuthenticated,
         systemPrompt: systemPrompt || SYSTEM_PROMPT_DEFAULT,
         agentId: selectedAgent?.id || null,
