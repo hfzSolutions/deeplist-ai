@@ -73,11 +73,11 @@ export function WelcomeDialog({
       <DialogContent className="sm:max-w-md">
         <DialogHeader className="text-left">
           <DialogTitle className="text-2xl font-bold text-foreground mb-2">
-            Customize Your AI! ✨
+            Welcome to DeepList AI! 👋
           </DialogTitle>
           <DialogDescription className="text-muted-foreground">
-            Build custom AI agents, switch instantly, and explore what others
-            have created:
+            Customize your AI experience - build agents, switch instantly, and
+            explore what others have created:
           </DialogDescription>
         </DialogHeader>
 
