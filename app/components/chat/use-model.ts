@@ -22,9 +22,7 @@ export function useModel({
   chatId,
 }: UseModelProps) {
   const { selectedAgent } = useAgents();
-  const [defaultModel, setDefaultModel] = useState<string>(
-    'openrouter:deepseek/deepseek-r1:free'
-  );
+  const [defaultModel, setDefaultModel] = useState<string | null>(null);
   const [manualModelOverride, setManualModelOverride] = useState<string | null>(
     null
   );
@@ -33,13 +31,27 @@ export function useModel({
   useEffect(() => {
     fetch('/api/model-config')
       .then((res) => res.json())
-      .then((data) => setDefaultModel(data.defaultModel))
-      .catch(() => setDefaultModel('openrouter:deepseek/deepseek-r1:free'));
+      .then((data) => {
+        if (data.defaultModel) {
+          setDefaultModel(data.defaultModel);
+        } else {
+          console.error('No default model configured');
+          setDefaultModel(null);
+        }
+      })
+      .catch((error) => {
+        console.error('Failed to fetch default model:', error);
+        setDefaultModel(null);
+      });
   }, []);
 
-  // Model selection: manual override > selectedAgent?.model > defaultModel
+  // Model selection: manual override > currentChat?.model > selectedAgent?.model > defaultModel
   const selectedModel =
-    manualModelOverride || selectedAgent?.model || defaultModel;
+    manualModelOverride ||
+    currentChat?.model ||
+    selectedAgent?.model ||
+    defaultModel ||
+    null;
 
   // Function to handle model changes
   const handleModelChange = useCallback(

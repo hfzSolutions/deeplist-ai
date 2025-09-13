@@ -3,8 +3,13 @@
 import { useBreakpoint } from '@/app/hooks/use-breakpoint';
 import { useKeyShortcut } from '@/app/hooks/use-key-shortcut';
 import { X } from 'lucide-react';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Button } from '@/components/ui/button';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 import {
   Dialog,
   DialogContent,
@@ -27,11 +32,6 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
 import { Popover, PopoverTrigger } from '@/components/ui/popover';
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from '@/components/ui/tooltip';
 import { useModel } from '@/lib/model-store/provider';
 import { filterAndSortModels } from '@/lib/model-store/utils';
 import { ModelConfig } from '@/lib/models/types';
@@ -67,6 +67,7 @@ export function ModelSelector({
   const currentProvider = PROVIDERS.find(
     (provider) => provider.id === currentModel?.icon
   );
+
   const isMobile = useBreakpoint(768);
 
   const [hoveredModel, setHoveredModel] = useState<string | null>(null);
@@ -133,6 +134,8 @@ export function ModelSelector({
       variant="outline"
       className={cn(
         'dark:bg-secondary justify-between max-w-[140px]',
+        !selectedModelId &&
+          'border-orange-500 bg-orange-50 dark:bg-orange-950/20',
         className
       )}
       disabled={isLoadingModels}
@@ -218,7 +221,11 @@ export function ModelSelector({
           <TooltipTrigger asChild>
             <DropdownMenuTrigger asChild>{trigger}</DropdownMenuTrigger>
           </TooltipTrigger>
-          <TooltipContent>Switch model ⌘⇧P</TooltipContent>
+          {!selectedModelId && (
+            <TooltipContent>
+              <p>Please select a model to start chatting</p>
+            </TooltipContent>
+          )}
           <DropdownMenuContent
             className="flex h-[320px] w-[300px] flex-col space-y-0.5 overflow-visible p-0"
             align="start"

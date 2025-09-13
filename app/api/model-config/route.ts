@@ -15,28 +15,25 @@ export async function GET() {
     // Fetch the default model from database
     const { data: defaultModelData, error } = await supabase
       .from('models')
-      .select('model_id')
+      .select('name')
       .eq('is_enabled', true)
       .eq('is_default', true)
       .single();
 
     if (error || !defaultModelData) {
-      // Fallback to a known working model if no default is set
-      return NextResponse.json({
-        defaultModel: 'openrouter:deepseek/deepseek-r1:free',
-      });
+      return NextResponse.json(
+        { error: 'No default model configured' },
+        { status: 404 }
+      );
     }
 
     return NextResponse.json({
-      defaultModel: defaultModelData.model_id,
+      defaultModel: defaultModelData.name,
     });
   } catch (error) {
     console.error('Error fetching model config:', error);
     return NextResponse.json(
-      {
-        defaultModel: 'openrouter:deepseek/deepseek-r1:free',
-        error: 'Failed to fetch model config',
-      },
+      { error: 'Failed to fetch model config' },
       { status: 500 }
     );
   }

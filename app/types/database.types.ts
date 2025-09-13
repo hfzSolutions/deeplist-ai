@@ -147,6 +147,7 @@ export type Database = {
           capabilities: string[] | null;
           description: string | null;
           sort_order: number;
+          is_default: boolean;
           created_at: string;
           updated_at: string;
         };
@@ -165,6 +166,7 @@ export type Database = {
           capabilities?: string[] | null;
           description?: string | null;
           sort_order?: number;
+          is_default?: boolean;
           created_at?: string;
           updated_at?: string;
         };
@@ -183,6 +185,7 @@ export type Database = {
           capabilities?: string[] | null;
           description?: string | null;
           sort_order?: number;
+          is_default?: boolean;
           created_at?: string;
           updated_at?: string;
         };

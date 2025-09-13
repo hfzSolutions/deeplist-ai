@@ -9,6 +9,7 @@ import {
   PromptInputTextarea,
 } from '@/components/prompt-kit/prompt-input';
 import { Button } from '@/components/ui/button';
+import { toast } from '@/components/ui/toast';
 import { useAgents } from '@/lib/agent-store/provider';
 import { getModelInfo } from '@/lib/models';
 import { ArrowUpIcon, StopIcon } from '@phosphor-icons/react';
@@ -91,11 +92,20 @@ export function ChatInput({
           return;
         }
 
+        if (!selectedModel) {
+          toast({
+            title: 'No model selected',
+            description: 'Please select a model before sending a message.',
+            status: 'error',
+          });
+          return;
+        }
+
         e.preventDefault();
         onSend();
       }
     },
-    [isSubmitting, onSend, status, value]
+    [isSubmitting, onSend, status, value, selectedModel]
   );
 
   const handlePaste = useCallback(
@@ -208,7 +218,10 @@ export function ChatInput({
                 size="sm"
                 className="size-9 rounded-full transition-all duration-300 ease-out"
                 disabled={Boolean(
-                  !value || isSubmitting || isOnlyWhitespace(value)
+                  !value ||
+                    isSubmitting ||
+                    isOnlyWhitespace(value) ||
+                    !selectedModel
                 )}
                 type="button"
                 onClick={handleSend}

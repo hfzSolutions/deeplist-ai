@@ -49,14 +49,14 @@ export async function GET(request: Request) {
 
   try {
     // Get the default model from database
-    const { data: defaultModelSetting } = await supabase
-      .from('app_settings')
-      .select('value')
-      .eq('key', 'default_model')
+    const { data: defaultModelData } = await supabase
+      .from('models')
+      .select('name')
+      .eq('is_enabled', true)
+      .eq('is_default', true)
       .single();
 
-    const defaultModel =
-      defaultModelSetting?.value || 'openrouter:deepseek/deepseek-r1:free';
+    const defaultModel = defaultModelData?.name || null;
 
     // Try to insert user only if not exists
     const { error: insertError } = await supabase.from('users').insert({
@@ -65,7 +65,7 @@ export async function GET(request: Request) {
       created_at: new Date().toISOString(),
       message_count: 0,
       premium: false,
-      favorite_models: [defaultModel],
+      favorite_models: defaultModel ? [defaultModel] : [],
     });
 
     if (insertError && insertError.code !== '23505') {
