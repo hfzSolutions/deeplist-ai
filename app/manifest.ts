@@ -21,7 +21,7 @@ export default function manifest(): MetadataRoute.Manifest {
         src: '/deeplistai-logo.png',
         sizes: 'any',
         type: 'image/png',
-        purpose: 'any maskable',
+        purpose: 'maskable',
       },
     ],
     screenshots: [

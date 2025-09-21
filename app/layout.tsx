@@ -18,6 +18,10 @@ import { ThemeProvider } from 'next-themes';
 import Script from 'next/script';
 import { LayoutClient } from './layout-client';
 import { PerformanceOptimizer } from './components/seo/performance';
+import {
+  AnalyticsProvider,
+  AnalyticsNoScript,
+} from './components/analytics/analytics-provider';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -161,55 +165,58 @@ export default async function RootLayout({
           }}
         />
       </head>
-      {isOfficialDeployment ? (
-        <Script
-          defer
-          src="https://assets.onedollarstats.com/stonks.js"
-          {...(isDev ? { 'data-debug': 'deeplist.ai' } : {})}
-        />
-      ) : null}
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        <AnalyticsNoScript />
         <PerformanceOptimizer />
-        <TanstackQueryProvider>
-          <LayoutClient />
-          <UserProvider initialUser={userProfile}>
-            <CategoriesProvider>
-              <AgentProvider>
-                <HomepageProvider>
-                  <ModelProvider>
-                    <ChatsProvider userId={userProfile?.id}>
-                      <ChatSessionProvider>
-                        <UserPreferencesProvider
-                          userId={userProfile?.id}
-                          initialPreferences={userProfile?.preferences}
-                        >
-                          <TooltipProvider
-                            delayDuration={200}
-                            skipDelayDuration={500}
+        <AnalyticsProvider>
+          {isOfficialDeployment ? (
+            <Script
+              defer
+              src="https://assets.onedollarstats.com/stonks.js"
+              {...(isDev ? { 'data-debug': 'deeplist.ai' } : {})}
+            />
+          ) : null}
+          <TanstackQueryProvider>
+            <LayoutClient />
+            <UserProvider initialUser={userProfile}>
+              <CategoriesProvider>
+                <AgentProvider>
+                  <HomepageProvider>
+                    <ModelProvider>
+                      <ChatsProvider userId={userProfile?.id}>
+                        <ChatSessionProvider>
+                          <UserPreferencesProvider
+                            userId={userProfile?.id}
+                            initialPreferences={userProfile?.preferences}
                           >
-                            <ThemeProvider
-                              attribute="class"
-                              defaultTheme="light"
-                              enableSystem
-                              disableTransitionOnChange
+                            <TooltipProvider
+                              delayDuration={200}
+                              skipDelayDuration={500}
                             >
-                              <SidebarProvider defaultOpen>
-                                <Toaster position="top-center" />
-                                {children}
-                              </SidebarProvider>
-                            </ThemeProvider>
-                          </TooltipProvider>
-                        </UserPreferencesProvider>
-                      </ChatSessionProvider>
-                    </ChatsProvider>
-                  </ModelProvider>
-                </HomepageProvider>
-              </AgentProvider>
-            </CategoriesProvider>
-          </UserProvider>
-        </TanstackQueryProvider>
+                              <ThemeProvider
+                                attribute="class"
+                                defaultTheme="light"
+                                enableSystem
+                                disableTransitionOnChange
+                              >
+                                <SidebarProvider defaultOpen>
+                                  <Toaster position="top-center" />
+                                  {children}
+                                </SidebarProvider>
+                              </ThemeProvider>
+                            </TooltipProvider>
+                          </UserPreferencesProvider>
+                        </ChatSessionProvider>
+                      </ChatsProvider>
+                    </ModelProvider>
+                  </HomepageProvider>
+                </AgentProvider>
+              </CategoriesProvider>
+            </UserProvider>
+          </TanstackQueryProvider>
+        </AnalyticsProvider>
       </body>
     </html>
   );

@@ -71,9 +71,9 @@ GOOGLE_SITE_VERIFICATION=your_google_verification_code
 YANDEX_VERIFICATION=your_yandex_verification_code
 YAHOO_VERIFICATION=your_yahoo_verification_code
 
-# Analytics (Optional)
-NEXT_PUBLIC_GA_ID=your_google_analytics_id
-NEXT_PUBLIC_GTM_ID=your_google_tag_manager_id
+# Analytics (Required for tracking)
+NEXT_PUBLIC_GA_ID=G-XXXXXXXXXX
+NEXT_PUBLIC_GTM_ID=GTM-XXXXXXX
 
 # Social Media
 NEXT_PUBLIC_TWITTER_HANDLE=@deeplistai
@@ -103,12 +103,21 @@ NEXT_PUBLIC_TWITTER_HANDLE=@deeplistai
 
 ## 📊 Monitoring & Analytics
 
+### Google Analytics Setup:
+
+1. **Create GA4 Property** - Set up Google Analytics 4
+2. **Get Measurement ID** - Copy your GA4 measurement ID (G-XXXXXXXXXX)
+3. **Set up Google Tag Manager** (optional but recommended)
+4. **Add environment variables** - Set NEXT_PUBLIC_GA_ID and NEXT_PUBLIC_GTM_ID
+5. **Track custom events** - Use the provided analytics hooks
+
 ### Recommended Tools:
 
 1. **Google Search Console** - Monitor search performance
 2. **Google PageSpeed Insights** - Check Core Web Vitals
 3. **Lighthouse** - Comprehensive SEO audit
 4. **Schema Markup Validator** - Verify structured data
+5. **Google Analytics** - Track user behavior and conversions
 
 ### Key Metrics to Track:
 

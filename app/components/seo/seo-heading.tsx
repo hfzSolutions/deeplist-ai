@@ -1,4 +1,4 @@
-import { ReactNode } from 'react';
+import { ReactNode, createElement } from 'react';
 
 interface SEOHeadingProps {
   level: 1 | 2 | 3 | 4 | 5 | 6;
@@ -13,12 +13,10 @@ export function SEOHeading({
   className = '',
   id,
 }: SEOHeadingProps) {
-  const HeadingTag = `h${level}` as keyof JSX.IntrinsicElements;
-
-  return (
-    <HeadingTag id={id} className={className}>
-      {children}
-    </HeadingTag>
+  return createElement(
+    `h${level}`,
+    { id, className },
+    children
   );
 }
 
