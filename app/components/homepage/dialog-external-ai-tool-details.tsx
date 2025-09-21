@@ -338,7 +338,7 @@ export function DialogExternalAIToolDetails({
           }}
           title={tool.name}
           description={tool.description}
-          shareUrl={`${typeof window !== 'undefined' ? window.location.origin : 'https://deeplist.ai'}/tools/${tool.id}`}
+          shareUrl={`${typeof window !== 'undefined' ? window.location.origin : 'https://deeplist.com'}/tools/${tool.id}`}
           shareType="tool"
         />
       </>
@@ -376,7 +376,7 @@ export function DialogExternalAIToolDetails({
         }}
         title={tool.name}
         description={tool.description}
-        shareUrl={`${typeof window !== 'undefined' ? window.location.origin : 'https://deeplist.ai'}/tools/${tool.id}`}
+        shareUrl={`${typeof window !== 'undefined' ? window.location.origin : 'https://deeplist.com'}/tools/${tool.id}`}
         shareType="tool"
       />
     </>

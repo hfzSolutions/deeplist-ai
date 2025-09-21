@@ -233,7 +233,7 @@ export function DialogAgentDetails({
           }}
           title={agent.name}
           description={agent.description || ''}
-          shareUrl={`${typeof window !== 'undefined' ? window.location.origin : 'https://deeplist.ai'}/agents/${agent.id}`}
+          shareUrl={`${typeof window !== 'undefined' ? window.location.origin : 'https://deeplist.com'}/agents/${agent.id}`}
           shareType="agent"
         />
       </>
@@ -263,7 +263,7 @@ export function DialogAgentDetails({
         }}
         title={agent.name}
         description={agent.description || ''}
-        shareUrl={`${typeof window !== 'undefined' ? window.location.origin : 'https://deeplist.ai'}/agents/${agent.id}`}
+        shareUrl={`${typeof window !== 'undefined' ? window.location.origin : 'https://deeplist.com'}/agents/${agent.id}`}
         shareType="agent"
       />
     </>

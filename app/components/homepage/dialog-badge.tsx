@@ -28,7 +28,7 @@ export function DialogBadge({ open, onOpenChange, tool }: DialogBadgeProps) {
     const baseUrl =
       typeof window !== 'undefined'
         ? window.location.origin
-        : 'https://deeplist.ai';
+        : 'https://deeplist.com';
     const toolUrl = `${baseUrl}/tools/${tool.id}`;
     const logoUrl = `${baseUrl}/deeplistai-logo.png`;
 
@@ -62,7 +62,7 @@ export function DialogBadge({ open, onOpenChange, tool }: DialogBadgeProps) {
     const baseUrl =
       typeof window !== 'undefined'
         ? window.location.origin
-        : 'https://deeplist.ai';
+        : 'https://deeplist.com';
     const toolUrl = `${baseUrl}/tools/${tool.id}`;
 
     return (

@@ -6,17 +6,17 @@ import {
   Img,
   Section,
   Text,
-} from "@react-email/components"
-import * as React from "react"
+} from '@react-email/components';
+import * as React from 'react';
 
 interface BaseEmailTemplateProps {
-  children: React.ReactNode
-  preview?: string
+  children: React.ReactNode;
+  preview?: string;
 }
 
 export const BaseEmailTemplate = ({
   children,
-  preview = "Deeplist AI",
+  preview = 'Deeplist AI',
 }: BaseEmailTemplateProps) => {
   return (
     <Html>
@@ -25,7 +25,7 @@ export const BaseEmailTemplate = ({
         <Container style={container}>
           <Section style={logoContainer}>
             <Img
-              src="https://deeplist.ai/deeplistai-logo.png"
+              src="https://deeplist.com/deeplistai-logo.png"
               width="40"
               height="40"
               alt="Deeplist AI"
@@ -34,53 +34,55 @@ export const BaseEmailTemplate = ({
           </Section>
           {children}
           <Text style={footer}>
-            Best regards,<br />
+            Best regards,
+            <br />
             The Deeplist AI Team
           </Text>
           <Text style={disclaimer}>
-            This email was sent to you because you have an account with Deeplist AI.
-            If you have any questions, please contact our support team.
+            This email was sent to you because you have an account with Deeplist
+            AI. If you have any questions, please contact our support team.
           </Text>
         </Container>
       </Body>
     </Html>
-  )
-}
+  );
+};
 
 const main = {
-  backgroundColor: "#ffffff",
-  fontFamily: '-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif',
-}
+  backgroundColor: '#ffffff',
+  fontFamily:
+    '-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif',
+};
 
 const container = {
-  margin: "0 auto",
-  padding: "20px 0 48px",
-  maxWidth: "560px",
-}
+  margin: '0 auto',
+  padding: '20px 0 48px',
+  maxWidth: '560px',
+};
 
 const logoContainer = {
-  marginTop: "32px",
-  textAlign: "center" as const,
-}
+  marginTop: '32px',
+  textAlign: 'center' as const,
+};
 
 const logo = {
-  margin: "0 auto",
-}
+  margin: '0 auto',
+};
 
 const footer = {
-  color: "#898989",
-  fontSize: "12px",
-  lineHeight: "22px",
-  marginTop: "32px",
-  marginBottom: "12px",
-}
+  color: '#898989',
+  fontSize: '12px',
+  lineHeight: '22px',
+  marginTop: '32px',
+  marginBottom: '12px',
+};
 
 const disclaimer = {
-  color: "#898989",
-  fontSize: "11px",
-  lineHeight: "18px",
-  marginTop: "12px",
-  marginBottom: "24px",
-}
+  color: '#898989',
+  fontSize: '11px',
+  lineHeight: '18px',
+  marginTop: '12px',
+  marginBottom: '24px',
+};
 
-export default BaseEmailTemplate
+export default BaseEmailTemplate;

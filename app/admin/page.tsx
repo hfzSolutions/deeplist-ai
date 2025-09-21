@@ -1,33 +1,33 @@
-import { LayoutApp } from "@/app/components/layout/layout-app"
-import { MessagesProvider } from "@/lib/chat-store/messages/provider"
-import { createClient } from "@/lib/supabase/server"
-import { redirect } from "next/navigation"
-import { AdminModelsPage } from "./components/admin-models-page"
+import { LayoutApp } from '@/app/components/layout/layout-app';
+import { MessagesProvider } from '@/lib/chat-store/messages/provider';
+import { createClient } from '@/lib/supabase/server';
+import { redirect } from 'next/navigation';
+import { AdminModelsPage } from './components/admin-models-page';
 
 export default async function AdminPage() {
-  const supabase = await createClient()
+  const supabase = await createClient();
 
   if (!supabase) {
-    redirect("/auth")
+    redirect('/auth');
   }
 
-  const { data: authData } = await supabase.auth.getUser()
+  const { data: authData } = await supabase.auth.getUser();
 
   if (!authData?.user?.id) {
-    redirect("/auth")
+    redirect('/auth');
   }
 
   // Check if user is admin (premium user)
   // For now, we'll assume all authenticated users can access admin
   // You can add proper admin role checking later
   const { data: user } = await supabase
-    .from("users")
-    .select("id")
-    .eq("id", authData.user.id)
-    .single()
+    .from('users')
+    .select('id')
+    .eq('id', authData.user.id)
+    .single();
 
   if (!user) {
-    redirect("/")
+    redirect('/');
   }
 
   return (
@@ -57,5 +57,5 @@ export default async function AdminPage() {
         </div>
       </LayoutApp>
     </MessagesProvider>
-  )
+  );
 }
