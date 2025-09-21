@@ -603,7 +603,7 @@ export function ExternalAITools({
         description={shareTool?.description || ''}
         shareUrl={
           shareTool
-            ? `${typeof window !== 'undefined' ? window.location.origin : 'https://deeplist.ai'}/tools/${shareTool.id}`
+            ? `${typeof window !== 'undefined' ? window.location.origin : 'https://deeplist.com'}/tools/${shareTool.id}`
             : ''
         }
         shareType="tool"

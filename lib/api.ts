@@ -1,15 +1,13 @@
-import { APP_DOMAIN } from "@/lib/config"
-import { SupabaseClient } from "@supabase/supabase-js"
-import { fetchClient } from "./fetch"
-import { API_ROUTE_UPDATE_CHAT_MODEL } from "./routes"
-
-
+import { APP_DOMAIN } from '@/lib/config';
+import { SupabaseClient } from '@supabase/supabase-js';
+import { fetchClient } from './fetch';
+import { API_ROUTE_UPDATE_CHAT_MODEL } from './routes';
 
 export class UsageLimitError extends Error {
-  code: string
+  code: string;
   constructor(message: string) {
-    super(message)
-    this.code = "DAILY_LIMIT_REACHED"
+    super(message);
+    this.code = 'DAILY_LIMIT_REACHED';
   }
 }
 
@@ -30,23 +28,23 @@ export async function checkRateLimits(
     const res = await fetchClient(
       `/api/rate-limits?userId=${userId}&isAuthenticated=${isAuthenticated}`,
       {
-        method: "GET",
-        headers: { "Content-Type": "application/json" },
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' },
       }
-    )
+    );
 
-    const responseData = await res.json()
+    const responseData = await res.json();
 
     if (!res.ok) {
       throw new Error(
         responseData.error ||
           `Failed to check rate limits: ${res.status} ${res.statusText}`
-      )
+      );
     }
-    return responseData
+    return responseData;
   } catch (err) {
-    console.error("Error checking rate limits:", err)
-    throw err
+    console.error('Error checking rate limits:', err);
+    throw err;
   }
 }
 
@@ -56,23 +54,23 @@ export async function checkRateLimits(
 export async function updateChatModel(chatId: string, model: string) {
   try {
     const res = await fetchClient(API_ROUTE_UPDATE_CHAT_MODEL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ chatId, model }),
-    })
-    const responseData = await res.json()
+    });
+    const responseData = await res.json();
 
     if (!res.ok) {
       throw new Error(
         responseData.error ||
           `Failed to update chat model: ${res.status} ${res.statusText}`
-      )
+      );
     }
 
-    return responseData
+    return responseData;
   } catch (error) {
-    console.error("Error updating chat model:", error)
-    throw error
+    console.error('Error updating chat model:', error);
+    throw error;
   }
 }
 
@@ -85,16 +83,16 @@ export async function signUpWithEmail(
   password: string
 ) {
   try {
-    const isDev = process.env.NODE_ENV === "development"
+    const isDev = process.env.NODE_ENV === 'development';
 
     // Get base URL dynamically
     const baseUrl = isDev
-      ? "http://localhost:3000"
-      : typeof window !== "undefined"
+      ? 'http://localhost:3000'
+      : typeof window !== 'undefined'
         ? window.location.origin
-        : process.env.NEXT_PUBLIC_VERCEL_URL
-          ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}`
-          : APP_DOMAIN
+        : process.env.NEXT_PUBLIC_APP_URL
+          ? `https://${process.env.NEXT_PUBLIC_APP_URL}`
+          : APP_DOMAIN;
 
     const { data, error } = await supabase.auth.signUp({
       email,
@@ -102,16 +100,16 @@ export async function signUpWithEmail(
       options: {
         emailRedirectTo: `${baseUrl}/auth/callback`,
       },
-    })
+    });
 
     if (error) {
-      throw error
+      throw error;
     }
 
-    return data
+    return data;
   } catch (err) {
-    console.error("Error signing up with email:", err)
-    throw err
+    console.error('Error signing up with email:', err);
+    throw err;
   }
 }
 
@@ -127,16 +125,16 @@ export async function signInWithEmail(
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
-    })
+    });
 
     if (error) {
-      throw error
+      throw error;
     }
 
-    return data
+    return data;
   } catch (err) {
-    console.error("Error signing in with email:", err)
-    throw err
+    console.error('Error signing in with email:', err);
+    throw err;
   }
 }
 
@@ -145,36 +143,36 @@ export async function signInWithEmail(
  */
 export async function signInWithGoogle(supabase: SupabaseClient) {
   try {
-    const isDev = process.env.NODE_ENV === "development"
+    const isDev = process.env.NODE_ENV === 'development';
 
     // Get base URL dynamically (will work in both browser and server environments)
     const baseUrl = isDev
-      ? "http://localhost:3000"
-      : typeof window !== "undefined"
+      ? 'http://localhost:3000'
+      : typeof window !== 'undefined'
         ? window.location.origin
-        : process.env.NEXT_PUBLIC_VERCEL_URL
-          ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}`
-          : APP_DOMAIN
+        : process.env.NEXT_PUBLIC_APP_URL
+          ? `https://${process.env.NEXT_PUBLIC_APP_URL}`
+          : APP_DOMAIN;
 
     const { data, error } = await supabase.auth.signInWithOAuth({
-      provider: "google",
+      provider: 'google',
       options: {
         redirectTo: `${baseUrl}/auth/callback`,
         queryParams: {
-          access_type: "offline",
-          prompt: "consent",
+          access_type: 'offline',
+          prompt: 'consent',
         },
       },
-    })
+    });
 
     if (error) {
-      throw error
+      throw error;
     }
 
     // Return the provider URL
-    return data
+    return data;
   } catch (err) {
-    console.error("Error signing in with Google:", err)
-    throw err
+    console.error('Error signing in with Google:', err);
+    throw err;
   }
 }
