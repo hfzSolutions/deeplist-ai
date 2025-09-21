@@ -68,4 +68,24 @@ export const commonFAQs: FAQItem[] = [
     answer:
       'Simply visit our homepage and start chatting with any AI model. You can explore different models, try our AI tools, create custom agents, and switch between them as needed. No complex setup required.',
   },
+  {
+    question: 'Can I use AI for writing content?',
+    answer:
+      'Yes! Deeplist AI provides access to various AI models perfect for writing, including GPT-4, Claude, and Gemini. You can use AI to write articles, blogs, content, and various types of text with ease.',
+  },
+  {
+    question: 'How do I use AI for content writing?',
+    answer:
+      'Choose the AI model that suits your writing needs, create clear prompts about the type of content you want to write, and AI will help generate high-quality text. You can also create custom AI agents specifically for writing with particular styles and topics.',
+  },
+  {
+    question: 'Apakah ada AI untuk menulis di Deeplist AI?',
+    answer:
+      'Ya! Deeplist AI menyediakan akses ke berbagai model AI untuk menulis seperti GPT-4, Claude, dan Gemini. Anda dapat menggunakan AI untuk menulis artikel, blog, konten, dan berbagai jenis teks lainnya dengan mudah.',
+  },
+  {
+    question: 'Adakah AI untuk menulis di Malaysia?',
+    answer:
+      'Ya! Deeplist AI tersedia untuk pengguna di Malaysia dan menyediakan akses ke pelbagai model AI untuk menulis. Anda boleh menggunakan AI untuk menulis artikel, blog, kandungan, dan pelbagai jenis teks lain dengan mudah.',
+  },
 ];
