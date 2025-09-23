@@ -11,7 +11,7 @@ interface AnalyticsProviderProps {
 }
 
 export function AnalyticsProvider({ children }: AnalyticsProviderProps) {
-  const gaId = process.env.NEXT_PUBLIC_GA_ID;
+  const gaId = process.env.NEXT_PUBLIC_GA_ID || 'G-SX9RHML1D5';
   const gtmId = process.env.NEXT_PUBLIC_GTM_ID;
 
   return (
