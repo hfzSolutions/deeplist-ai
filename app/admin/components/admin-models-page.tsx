@@ -30,7 +30,16 @@ import {
 } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Pagination } from '@/components/ui/pagination';
-import { Plus, Edit, Trash2, Save, X, RefreshCw } from 'lucide-react';
+import {
+  Plus,
+  Edit,
+  Trash2,
+  Save,
+  X,
+  RefreshCw,
+  Search,
+  Check,
+} from 'lucide-react';
 import { toast } from 'sonner';
 
 interface Model {
@@ -50,6 +59,20 @@ interface Model {
   sort_order: number;
   created_at: string;
   updated_at: string;
+}
+
+interface SearchResult {
+  id: string;
+  name: string;
+  description?: string;
+  context_length?: number;
+  pricing: {
+    prompt: string;
+    completion: string;
+  };
+  is_free: boolean;
+  capabilities: string[];
+  provider: string;
 }
 
 const PROVIDERS = [
@@ -72,6 +95,18 @@ export function AdminModelsPage() {
   const [editingModel, setEditingModel] = useState<Model | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [formData, setFormData] = useState<Partial<Model>>({});
+
+  // Search state
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
+  const [isSearchDialogOpen, setIsSearchDialogOpen] = useState(false);
+  const [addingModel, setAddingModel] = useState<string | null>(null);
+
+  // Sync confirmation state
+  const [syncPreview, setSyncPreview] = useState<any>(null);
+  const [isSyncConfirmDialogOpen, setIsSyncConfirmDialogOpen] = useState(false);
+  const [isApplyingSync, setIsApplyingSync] = useState(false);
 
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
@@ -174,6 +209,31 @@ export function AdminModelsPage() {
         const data = await response.json();
         const { result } = data;
 
+        // Show preview dialog instead of applying immediately
+        setSyncPreview(result);
+        setIsSyncConfirmDialogOpen(true);
+      } else {
+        const error = await response.json();
+        toast.error(error.error || 'Failed to sync OpenRouter models');
+      }
+    } catch (error) {
+      toast.error('Error syncing OpenRouter models');
+    } finally {
+      setSyncing(false);
+    }
+  };
+
+  const handleApplySync = async () => {
+    setIsApplyingSync(true);
+    try {
+      const response = await fetch('/api/admin/sync-openrouter-models', {
+        method: 'PUT',
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        const { result } = data;
+
         toast.success(
           `Sync completed! ${result.new_models} new models added, ${result.updated_models} updated. ${result.free_models} free models found out of ${result.total_fetched} total.`
         );
@@ -186,14 +246,84 @@ export function AdminModelsPage() {
         }
 
         fetchModels();
+        setIsSyncConfirmDialogOpen(false);
+        setSyncPreview(null);
       } else {
         const error = await response.json();
-        toast.error(error.error || 'Failed to sync OpenRouter models');
+        toast.error(error.error || 'Failed to apply sync changes');
       }
     } catch (error) {
-      toast.error('Error syncing OpenRouter models');
+      toast.error('Error applying sync changes');
     } finally {
-      setSyncing(false);
+      setIsApplyingSync(false);
+    }
+  };
+
+  const handleSearchOpenRouter = async () => {
+    if (!searchQuery.trim()) {
+      toast.error('Please enter a search query');
+      return;
+    }
+
+    setIsSearching(true);
+    try {
+      const response = await fetch('/api/admin/search-openrouter-models', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ searchQuery: searchQuery.trim() }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setSearchResults(data.results || []);
+        setIsSearchDialogOpen(true);
+
+        if (data.results.length === 0) {
+          toast.info('No models found matching your search');
+        }
+      } else {
+        const error = await response.json();
+        toast.error(error.error || 'Failed to search OpenRouter models');
+      }
+    } catch (error) {
+      toast.error('Error searching OpenRouter models');
+    } finally {
+      setIsSearching(false);
+    }
+  };
+
+  const handleAddModel = async (model: SearchResult) => {
+    setAddingModel(model.id);
+    try {
+      const response = await fetch('/api/admin/search-openrouter-models', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          modelId: model.id,
+          modelName: model.name,
+          description: model.description,
+          contextLength: model.context_length,
+          pricing: model.pricing,
+          capabilities: model.capabilities,
+          provider: model.provider,
+        }),
+      });
+
+      if (response.ok) {
+        toast.success(`Model "${model.name}" added successfully`);
+        fetchModels(); // Refresh the models list
+      } else {
+        const error = await response.json();
+        toast.error(error.error || 'Failed to add model');
+      }
+    } catch (error) {
+      toast.error('Error adding model');
+    } finally {
+      setAddingModel(null);
     }
   };
 
@@ -223,6 +353,29 @@ export function AdminModelsPage() {
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-semibold">AI Models</h2>
         <div className="flex gap-2">
+          <div className="flex gap-2">
+            <Input
+              placeholder="Search OpenRouter models..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              onKeyPress={(e) => {
+                if (e.key === 'Enter') {
+                  handleSearchOpenRouter();
+                }
+              }}
+              className="w-64"
+            />
+            <Button
+              variant="outline"
+              onClick={handleSearchOpenRouter}
+              disabled={isSearching}
+            >
+              <Search
+                className={`w-4 h-4 mr-2 ${isSearching ? 'animate-spin' : ''}`}
+              />
+              {isSearching ? 'Searching...' : 'Search'}
+            </Button>
+          </div>
           <Button
             variant="outline"
             onClick={handleSyncOpenRouter}
@@ -501,6 +654,220 @@ export function AdminModelsPage() {
           className="mt-4"
         />
       )}
+
+      {/* Search Results Dialog */}
+      <Dialog open={isSearchDialogOpen} onOpenChange={setIsSearchDialogOpen}>
+        <DialogContent className="max-w-5xl max-h-[85vh] overflow-y-auto">
+          <DialogHeader className="pb-3">
+            <DialogTitle className="text-lg">
+              Search Results - OpenRouter Models
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-2">
+            {searchResults.length === 0 ? (
+              <div className="text-center py-6 text-muted-foreground">
+                No models found matching your search.
+              </div>
+            ) : (
+              <div className="space-y-1">
+                {searchResults.map((model) => (
+                  <div
+                    key={model.id}
+                    className="border rounded-md p-3 hover:bg-muted/50 transition-colors"
+                  >
+                    <div className="flex items-start gap-3">
+                      {/* Left side - Model info */}
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-1 flex-wrap">
+                          <div className="font-medium truncate max-w-[300px]">
+                            {model.name}
+                          </div>
+                          <div className="flex items-center gap-1 flex-shrink-0">
+                            <Badge variant="outline" className="text-xs">
+                              {model.provider}
+                            </Badge>
+                            <Badge
+                              variant={model.is_free ? 'secondary' : 'default'}
+                              className="text-xs"
+                            >
+                              {model.is_free ? 'Free' : 'Premium'}
+                            </Badge>
+                            {model.context_length && (
+                              <Badge variant="outline" className="text-xs">
+                                {model.context_length > 1000
+                                  ? `${Math.round(model.context_length / 1000)}k`
+                                  : model.context_length.toLocaleString()}
+                              </Badge>
+                            )}
+                          </div>
+                        </div>
+                        <div className="text-xs text-muted-foreground truncate mb-1">
+                          {model.id}
+                        </div>
+                        {model.description && (
+                          <div className="text-xs text-muted-foreground line-clamp-2 mb-2">
+                            {model.description}
+                          </div>
+                        )}
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <div className="flex gap-1 flex-wrap">
+                            {model.capabilities.map((capability) => (
+                              <Badge
+                                key={capability}
+                                variant="outline"
+                                className="text-xs px-1.5 py-0.5"
+                              >
+                                {capability}
+                              </Badge>
+                            ))}
+                          </div>
+                          {model.pricing && (
+                            <div className="text-xs text-muted-foreground">
+                              ${model.pricing.prompt}/$
+                              {model.pricing.completion}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Right side - Add button */}
+                      <div className="flex-shrink-0">
+                        <Button
+                          size="sm"
+                          onClick={() => handleAddModel(model)}
+                          disabled={addingModel === model.id}
+                          className="h-8 px-3"
+                        >
+                          {addingModel === model.id ? (
+                            <>
+                              <RefreshCw className="w-3 h-3 mr-1 animate-spin" />
+                              Adding...
+                            </>
+                          ) : (
+                            <>
+                              <Check className="w-3 h-3 mr-1" />
+                              Add
+                            </>
+                          )}
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Sync Confirmation Dialog */}
+      <Dialog
+        open={isSyncConfirmDialogOpen}
+        onOpenChange={setIsSyncConfirmDialogOpen}
+      >
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Confirm Sync Changes</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            {syncPreview && (
+              <div className="space-y-3">
+                <div className="text-sm text-muted-foreground">
+                  Review the changes that will be made to your models:
+                </div>
+
+                <div className="grid grid-cols-2 gap-4 p-4 bg-muted/50 rounded-lg">
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2">
+                      <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                      <span className="font-medium">New Models</span>
+                    </div>
+                    <div className="text-2xl font-bold text-green-600">
+                      {syncPreview.new_models}
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2">
+                      <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                      <span className="font-medium">Updated Models</span>
+                    </div>
+                    <div className="text-2xl font-bold text-blue-600">
+                      {syncPreview.updated_models}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="text-sm text-muted-foreground">
+                  <div>
+                    Total free models found:{' '}
+                    <span className="font-medium">
+                      {syncPreview.free_models}
+                    </span>
+                  </div>
+                  <div>
+                    Total models fetched:{' '}
+                    <span className="font-medium">
+                      {syncPreview.total_fetched}
+                    </span>
+                  </div>
+                </div>
+
+                {syncPreview.errors && syncPreview.errors.length > 0 && (
+                  <div className="p-3 bg-destructive/10 border border-destructive/20 rounded-lg">
+                    <div className="text-sm font-medium text-destructive mb-2">
+                      {syncPreview.errors.length} errors occurred:
+                    </div>
+                    <div className="text-xs text-destructive space-y-1">
+                      {syncPreview.errors
+                        .slice(0, 3)
+                        .map((error: string, index: number) => (
+                          <div key={index}>• {error}</div>
+                        ))}
+                      {syncPreview.errors.length > 3 && (
+                        <div>
+                          • ... and {syncPreview.errors.length - 3} more errors
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                <div className="p-3 bg-amber-50 border border-amber-200 rounded-lg">
+                  <div className="text-sm text-amber-800">
+                    <strong>Note:</strong> All new models will be added as{' '}
+                    <strong>disabled</strong> by default. You can enable them
+                    individually after the sync is complete.
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+
+          <div className="flex justify-end space-x-2">
+            <Button
+              variant="outline"
+              onClick={() => setIsSyncConfirmDialogOpen(false)}
+              disabled={isApplyingSync}
+            >
+              Cancel
+            </Button>
+            <Button onClick={handleApplySync} disabled={isApplyingSync}>
+              {isApplyingSync ? (
+                <>
+                  <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+                  Applying Changes...
+                </>
+              ) : (
+                <>
+                  <Check className="w-4 h-4 mr-2" />
+                  Apply Sync
+                </>
+              )}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
