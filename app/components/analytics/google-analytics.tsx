@@ -14,21 +14,19 @@ export function GoogleAnalytics({ gaId }: GoogleAnalyticsProps) {
   return (
     <>
       <Script
-        strategy="afterInteractive"
+        strategy="beforeInteractive"
         src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`}
+        async
       />
       <Script
         id="google-analytics"
-        strategy="afterInteractive"
+        strategy="beforeInteractive"
         dangerouslySetInnerHTML={{
           __html: `
             window.dataLayer = window.dataLayer || [];
             function gtag(){dataLayer.push(arguments);}
             gtag('js', new Date());
-            gtag('config', '${gaId}', {
-              page_title: document.title,
-              page_location: window.location.href,
-            });
+            gtag('config', '${gaId}');
           `,
         }}
       />
