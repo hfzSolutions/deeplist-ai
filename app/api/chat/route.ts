@@ -72,6 +72,7 @@ export async function POST(req: Request) {
 
     // Extract model ID for OpenRouter (remove 'openrouter:' prefix)
     const openrouterModelId = model.replace('openrouter:', '');
+
     const result = streamText({
       model: openrouter(openrouterModelId),
       system: effectiveSystemPrompt,
@@ -79,7 +80,7 @@ export async function POST(req: Request) {
       tools: {} as ToolSet,
       maxSteps: 10,
       onError: (err: unknown) => {
-        console.error('Streaming error occurred:', err);
+        console.error('❌ Streaming error occurred:', err);
       },
 
       onFinish: async ({ response }) => {

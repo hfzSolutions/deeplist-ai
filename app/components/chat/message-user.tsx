@@ -85,7 +85,7 @@ export function MessageUser({
           className="flex flex-row gap-2"
           key={`${attachment.name}-${index}`}
         >
-          {attachment.contentType?.startsWith('image') ? (
+          {attachment.contentType?.startsWith('image') && attachment.url ? (
             <MorphingDialog
               transition={{
                 type: 'spring',
@@ -115,7 +115,7 @@ export function MessageUser({
                 <MorphingDialogClose className="text-primary" />
               </MorphingDialogContainer>
             </MorphingDialog>
-          ) : attachment.contentType?.startsWith('text') ? (
+          ) : attachment.contentType?.startsWith('text') && attachment.url ? (
             <div className="text-primary mb-3 h-24 w-40 overflow-hidden rounded-md border p-2 text-xs">
               {getTextFromDataUrl(attachment.url)}
             </div>

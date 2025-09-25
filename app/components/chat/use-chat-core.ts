@@ -18,7 +18,7 @@ type UseChatCoreProps = {
   files: File[];
   createOptimisticAttachments: (
     files: File[]
-  ) => Array<{ name: string; contentType: string; url: string }>;
+  ) => Array<{ name: string; contentType: string; url?: string }>;
   setFiles: (files: File[]) => void;
   checkLimitsAndNotify: (uid: string) => Promise<boolean>;
   cleanupOptimisticAttachments: (attachments?: Array<{ url?: string }>) => void;
