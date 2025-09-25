@@ -23,7 +23,7 @@ const ALLOWED_FILE_TYPES = [
 export type Attachment = {
   name: string;
   contentType: string;
-  url?: string;
+  url: string;
 };
 
 export async function validateFile(

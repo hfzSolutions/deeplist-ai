@@ -73,15 +73,6 @@ export async function POST(req: Request) {
     // Extract model ID for OpenRouter (remove 'openrouter:' prefix)
     const openrouterModelId = model.replace('openrouter:', '');
 
-    console.log('🤖 Starting AI stream:', {
-      model: openrouterModelId,
-      messageCount: messages.length,
-      hasAttachments: messages.some((m) => m.experimental_attachments?.length),
-      attachments: messages
-        .map((m) => m.experimental_attachments)
-        .filter(Boolean),
-    });
-
     const result = streamText({
       model: openrouter(openrouterModelId),
       system: effectiveSystemPrompt,
