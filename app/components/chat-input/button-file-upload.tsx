@@ -14,7 +14,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
-import { getModelInfo } from '@/lib/models';
+import { useModel } from '@/lib/model-store/provider';
 import { isSupabaseEnabled } from '@/lib/supabase/config';
 import { cn } from '@/lib/utils';
 import { FileArrowUp, Paperclip } from '@phosphor-icons/react';
@@ -33,12 +33,14 @@ export function ButtonFileUpload({
   model,
 }: ButtonFileUploadProps) {
   const router = useRouter();
+  const { models } = useModel();
 
   if (!isSupabaseEnabled) {
     return null;
   }
 
-  const isFileUploadAvailable = getModelInfo(model)?.vision;
+  const selectedModel = models.find((m) => m.id === model);
+  const isFileUploadAvailable = selectedModel?.vision;
 
   if (!isFileUploadAvailable) {
     return (
