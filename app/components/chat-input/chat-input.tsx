@@ -55,7 +55,6 @@ export function ChatInput({
   setEnableSearch,
   enableSearch,
 }: ChatInputProps) {
-  const { selectedAgent, setSelectedAgent, agents } = useAgents();
   const selectModelConfig = selectedModel ? getModelInfo(selectedModel) : null;
   const hasSearchSupport = Boolean(selectModelConfig?.webSearch);
   const isOnlyWhitespace = (text: string) => !/[^\s]/.test(text);
