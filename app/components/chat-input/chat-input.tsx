@@ -1,6 +1,5 @@
 'use client';
 
-import { AgentSelector } from '@/components/common/agent-selector/base';
 import { ModelSelector } from '@/components/common/model-selector/base';
 import {
   PromptInput,
@@ -10,7 +9,6 @@ import {
 } from '@/components/prompt-kit/prompt-input';
 import { Button } from '@/components/ui/button';
 import { toast } from '@/components/ui/toast';
-import { useAgents } from '@/lib/agent-store/provider';
 import { getModelInfo } from '@/lib/models';
 import { ArrowUpIcon, StopIcon } from '@phosphor-icons/react';
 import { useCallback, useMemo } from 'react';
@@ -183,19 +181,6 @@ export function ChatInput({
                 onFileUpload={onFileUpload}
                 isUserAuthenticated={isUserAuthenticated}
                 model={selectedModel || ''}
-              />
-              <AgentSelector
-                selectedAgentId={selectedAgent?.id}
-                setSelectedAgentId={(agentId) => {
-                  if (agentId) {
-                    const agent = agents.find((a) => a.id === agentId);
-                    setSelectedAgent(agent || null);
-                  } else {
-                    setSelectedAgent(null);
-                  }
-                }}
-                isUserAuthenticated={isUserAuthenticated}
-                className="rounded-full"
               />
               <ModelSelector
                 selectedModelId={selectedModel || ''}

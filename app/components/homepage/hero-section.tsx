@@ -13,11 +13,7 @@ import { Badge } from '@/components/ui/badge';
 const mainBenefits = [
   {
     icon: <Zap className="h-6 w-6" />,
-    text: 'Build Custom AI',
-  },
-  {
-    icon: <ArrowRightLeft className="h-6 w-6" />,
-    text: 'Switch Instantly',
+    text: 'Discover Tools',
   },
   {
     icon: <Users className="h-6 w-6" />,
@@ -43,17 +39,16 @@ export function HeroSection({ onStartChatting }: HeroSectionProps = {}) {
 
         {/* Main Headline */}
         <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6 leading-tight">
-          Customize
+          Discover
           <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
             {' '}
-            Your AI
+            AI Tools
           </span>
         </h1>
 
         {/* Subheadline */}
         <p className="text-xl md:text-2xl text-gray-600 mb-8 max-w-3xl mx-auto leading-relaxed">
-          Build custom AI agents, switch instantly, and explore what others have
-          created - all in one platform.
+          Explore the best AI tools, discover new solutions, and find the perfect tool for your needs - all in one platform.
         </p>
 
         {/* Main Benefits */}
@@ -90,7 +85,7 @@ export function HeroSection({ onStartChatting }: HeroSectionProps = {}) {
               window.location.href = '/store';
             }}
           >
-            Explore AI Agents
+            Explore Tools
           </Button>
         </div>
 

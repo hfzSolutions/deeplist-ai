@@ -8,6 +8,7 @@ import { AgentProvider } from '@/lib/agent-store/provider';
 import { CategoriesProvider } from '@/lib/categories-store/provider';
 import { ChatsProvider } from '@/lib/chat-store/chats/provider';
 import { ChatSessionProvider } from '@/lib/chat-store/session/provider';
+import { ExternalAIToolsProvider } from '@/lib/external-ai-tools-store/provider';
 import { HomepageProvider } from '@/lib/homepage-store/provider';
 import { ModelProvider } from '@/lib/model-store/provider';
 import { TanstackQueryProvider } from '@/lib/tanstack-query/tanstack-query-provider';
@@ -203,15 +204,16 @@ export default async function RootLayout({
             <LayoutClient />
             <UserProvider initialUser={userProfile}>
               <CategoriesProvider>
-                <AgentProvider>
-                  <HomepageProvider>
-                    <ModelProvider>
-                      <ChatsProvider userId={userProfile?.id}>
-                        <ChatSessionProvider>
-                          <UserPreferencesProvider
-                            userId={userProfile?.id}
-                            initialPreferences={userProfile?.preferences}
-                          >
+                <ExternalAIToolsProvider>
+                  <AgentProvider>
+                    <HomepageProvider>
+                      <ModelProvider>
+                        <ChatsProvider userId={userProfile?.id}>
+                          <ChatSessionProvider>
+                            <UserPreferencesProvider
+                              userId={userProfile?.id}
+                              initialPreferences={userProfile?.preferences}
+                            >
                             <TooltipProvider
                               delayDuration={200}
                               skipDelayDuration={500}
@@ -228,12 +230,13 @@ export default async function RootLayout({
                                 </SidebarProvider>
                               </ThemeProvider>
                             </TooltipProvider>
-                          </UserPreferencesProvider>
-                        </ChatSessionProvider>
-                      </ChatsProvider>
-                    </ModelProvider>
-                  </HomepageProvider>
-                </AgentProvider>
+                            </UserPreferencesProvider>
+                          </ChatSessionProvider>
+                        </ChatsProvider>
+                      </ModelProvider>
+                    </HomepageProvider>
+                  </AgentProvider>
+                </ExternalAIToolsProvider>
               </CategoriesProvider>
             </UserProvider>
           </TanstackQueryProvider>

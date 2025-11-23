@@ -208,7 +208,7 @@ export function ExternalToolsSection({ toolId }: ExternalToolsSectionProps) {
 
   const handleEditWithAuth = (tool: ExternalAITool) => {
     if (!user) {
-      handleLoginPrompt('edit external AI tools');
+      handleLoginPrompt('edit AI tools');
       return;
     }
     handleEdit(tool);
@@ -218,16 +218,16 @@ export function ExternalToolsSection({ toolId }: ExternalToolsSectionProps) {
     if (confirm(`Are you sure you want to delete "${tool.name}"?`)) {
       const success = await deleteTool(tool.id);
       if (success) {
-        toast.success('External AI tool deleted successfully');
+        toast.success('AI tool deleted successfully');
       } else {
-        toast.error('Failed to delete external AI tool');
+        toast.error('Failed to delete AI tool');
       }
     }
   };
 
   const handleDeleteWithAuth = async (tool: ExternalAITool) => {
     if (!user) {
-      handleLoginPrompt('delete external AI tools');
+      handleLoginPrompt('delete AI tools');
       return;
     }
     handleDelete(tool);
@@ -278,10 +278,10 @@ export function ExternalToolsSection({ toolId }: ExternalToolsSectionProps) {
           <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <h2 className="text-2xl font-bold tracking-tight">
-                External Tools Store
+                AI Tools Store
               </h2>
               <p className="text-muted-foreground mt-1 text-sm">
-                Discover and integrate external AI tools
+                Discover the best AI tools for your needs.
               </p>
             </div>
             <div className="flex items-center gap-3">
@@ -298,7 +298,7 @@ export function ExternalToolsSection({ toolId }: ExternalToolsSectionProps) {
               <div className="relative w-full sm:max-w-md sm:flex-1">
                 <MagnifyingGlass className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 transform" />
                 <Input
-                  placeholder="Search external AI tools..."
+                  placeholder="Search AI tools..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="pr-10 pl-10 h-10"
@@ -544,13 +544,13 @@ export function ExternalToolsSection({ toolId }: ExternalToolsSectionProps) {
                   ? 'No tools found'
                   : showMyToolsOnly && user
                     ? 'No tools created by you'
-                    : 'No external AI tools available'}
+                    : 'No AI tools available'}
               </h3>
               <p className="text-muted-foreground mb-3 max-w-sm text-xs">
                 {searchQuery
                   ? 'Try adjusting your search terms'
                   : showMyToolsOnly && user
-                    ? 'Create your first external AI tool to get started'
+                    ? 'Create your first AI tool to get started'
                     : 'Check back later for new tools'}
               </p>
               {(searchQuery || (showMyToolsOnly && user)) && (

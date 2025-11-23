@@ -1,33 +1,29 @@
 'use client';
 
-import { HistoryTrigger } from '@/app/components/history/history-trigger';
 import { AppInfoTrigger } from '@/app/components/layout/app-info/app-info-trigger';
-import { ButtonNewChat } from '@/app/components/layout/button-new-chat';
 import { ButtonStore } from '@/app/components/layout/button-store';
+import { HeaderUserMenu } from '@/app/components/layout/header-user-menu';
 import { useBreakpoint } from '@/app/hooks/use-breakpoint';
 import { DeeplistAIIcon } from '@/components/icons/deeplist-ai';
 import { Button } from '@/components/ui/button';
-import { useSidebar } from '@/components/ui/sidebar';
 import { APP_NAME } from '@/lib/config';
 import { useUserPreferences } from '@/lib/user-preference-store/provider';
 import { useUser } from '@/lib/user-store/provider';
-import { Info } from '@phosphor-icons/react';
+import { Gear, SignIn } from '@phosphor-icons/react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { DialogPublish } from './dialog-publish';
-import { HeaderSidebarTrigger } from './header-sidebar-trigger';
 
-export function Header({ hasSidebar }: { hasSidebar: boolean }) {
+export function Header() {
   const isMobile = useBreakpoint(768);
   const { user } = useUser();
   const { preferences } = useUserPreferences();
-  const { open, openMobile } = useSidebar();
   const isMultiModelEnabled = preferences.multiModelEnabled;
   const pathname = usePathname();
+  const router = useRouter();
 
   const isLoggedIn = !!user;
   const isOnStorePage = pathname === '/';
-  const isSidebarOpen = isMobile ? openMobile : open;
 
   return (
     <header className="h-app-header pointer-events-none fixed top-0 right-0 left-0 z-[9999]">
@@ -42,42 +38,46 @@ export function Header({ hasSidebar }: { hasSidebar: boolean }) {
                 <DeeplistAIIcon className="mr-1 size-5 sm:size-6 flex-shrink-0" />
                 <span className="truncate">{APP_NAME}</span>
               </Link>
-              {hasSidebar && isMobile && !isSidebarOpen && (
-                <HeaderSidebarTrigger />
-              )}
             </div>
           </div>
           <div className="flex-shrink-0" />
-          {!isLoggedIn ? (
-            <div className="pointer-events-auto flex flex-1 items-center justify-end gap-2 sm:gap-4">
-              {/* <AppInfoTrigger
-                trigger={
+          <div className="pointer-events-auto flex flex-1 items-center justify-end gap-1 sm:gap-2">
+            {!isLoggedIn ? (
+              <>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => {
+                    const returnUrl = encodeURIComponent(
+                      pathname + (typeof window !== 'undefined' ? window.location.search : '')
+                    );
+                    router.push(`/auth?returnUrl=${returnUrl}`);
+                  }}
+                  className="text-muted-foreground hover:text-foreground"
+                >
+                  <SignIn className="mr-2 h-4 w-4" />
+                  Login
+                </Button>
+              </>
+            ) : (
+              <>
+                {!isMultiModelEnabled && <DialogPublish />}
+                {!isOnStorePage && <ButtonStore />}
+                {user?.is_admin && (
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="bg-background hover:bg-muted text-muted-foreground h-8 w-8 rounded-full"
-                    aria-label={`About ${APP_NAME}`}
+                    onClick={() => router.push('/admin')}
+                    className="h-8 w-8"
+                    aria-label="Admin Panel"
                   >
-                    <Info className="size-4" />
+                    <Gear className="h-4 w-4" />
                   </Button>
-                }
-              /> */}
-              {/* Login button hidden as requested */}
-              {/* <Link
-                href="/auth"
-                className="font-base text-muted-foreground hover:text-foreground text-base transition-colors"
-              >
-                Login
-              </Link> */}
-            </div>
-          ) : (
-            <div className="pointer-events-auto flex flex-1 items-center justify-end gap-1 sm:gap-2">
-              {!isMultiModelEnabled && <DialogPublish />}
-              {!isOnStorePage && <ButtonStore />}
-              <ButtonNewChat />
-              <HistoryTrigger hasSidebar={hasSidebar} />
-            </div>
-          )}
+                )}
+                <HeaderUserMenu />
+              </>
+            )}
+          </div>
         </div>
       </div>
     </header>

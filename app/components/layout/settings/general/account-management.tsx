@@ -13,7 +13,6 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { toast } from '@/components/ui/toast';
 import { useChats } from '@/lib/chat-store/chats/provider';
-import { useMessages } from '@/lib/chat-store/messages/provider';
 import { clearAllIndexedDBStores } from '@/lib/chat-store/persist';
 import { useUser } from '@/lib/user-store/provider';
 import { SignOut, Trash } from '@phosphor-icons/react';
@@ -23,7 +22,6 @@ import { useState } from 'react';
 export function AccountManagement() {
   const { signOut, isLoading: userLoading, user } = useUser();
   const { resetChats } = useChats();
-  const { resetMessages } = useMessages();
   const router = useRouter();
   const [isSigningOut, setIsSigningOut] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -40,7 +38,6 @@ export function AccountManagement() {
     try {
       // Clear local data first
       await Promise.all([
-        resetMessages(),
         resetChats(),
         clearAllIndexedDBStores(),
       ]);
@@ -100,7 +97,6 @@ export function AccountManagement() {
 
       // Clear local data
       await Promise.all([
-        resetMessages(),
         resetChats(),
         clearAllIndexedDBStores(),
       ]);

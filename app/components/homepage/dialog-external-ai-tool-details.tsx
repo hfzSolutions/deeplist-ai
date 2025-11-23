@@ -101,9 +101,9 @@ export function DialogExternalAIToolDetails({
     <>
       <DialogTitle className="flex items-center gap-2">
         <Robot className="h-5 w-5" />
-        External AI Tool Details
+        AI Tool Details
       </DialogTitle>
-      <DialogDescription>View external AI tool information</DialogDescription>
+      <DialogDescription>View AI tool information</DialogDescription>
     </>
   );
 
@@ -348,7 +348,7 @@ export function DialogExternalAIToolDetails({
   return (
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="flex max-h-[90vh] w-full max-w-2xl flex-col overflow-hidden">
+        <DialogContent className="flex h-[80%] min-h-[480px] w-full flex-col gap-0 p-0 sm:max-w-[768px] overflow-hidden">
           <DialogHeader className="border-b px-6 py-4">
             <HeaderContent />
           </DialogHeader>
