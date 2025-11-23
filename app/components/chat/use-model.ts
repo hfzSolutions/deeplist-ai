@@ -1,5 +1,4 @@
 import { toast } from '@/components/ui/toast';
-import { useAgents } from '@/lib/agent-store/provider';
 import { Chats } from '@/lib/chat-store/types';
 import type { UserProfile } from '@/lib/user/types';
 import { useCallback, useState, useEffect } from 'react';
@@ -13,7 +12,7 @@ interface UseModelProps {
 
 /**
  * Simplified hook to manage the current selected model
- * Uses selectedAgent directly: if null use defaultModel, if has value use selectedAgent.model
+ * Model selection: manual override > currentChat?.model > defaultModel
  */
 export function useModel({
   currentChat,
@@ -21,7 +20,6 @@ export function useModel({
   updateChatModel,
   chatId,
 }: UseModelProps) {
-  const { selectedAgent } = useAgents();
   const [defaultModel, setDefaultModel] = useState<string | null>(null);
   const [manualModelOverride, setManualModelOverride] = useState<string | null>(
     null
@@ -45,11 +43,10 @@ export function useModel({
       });
   }, []);
 
-  // Model selection: manual override > currentChat?.model > selectedAgent?.model > defaultModel
+  // Model selection: manual override > currentChat?.model > defaultModel
   const selectedModel =
     manualModelOverride ||
     currentChat?.model ||
-    selectedAgent?.model ||
     defaultModel ||
     null;
 

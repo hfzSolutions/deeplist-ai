@@ -1,5 +1,4 @@
 import { toast } from '@/components/ui/toast';
-import { useAgents } from '@/lib/agent-store/provider';
 
 import { MESSAGE_MAX_LENGTH, SYSTEM_PROMPT_DEFAULT } from '@/lib/config';
 import { Attachment } from '@/lib/file-handling';
@@ -55,14 +54,12 @@ export function useChatCore({
   const hasSentFirstMessageRef = useRef(false);
   const prevChatIdRef = useRef<string | null>(chatId);
   const isAuthenticated = useMemo(() => !!user?.id, [user?.id]);
-  const { selectedAgent } = useAgents();
   const router = useRouter();
   const systemPrompt = useMemo(
     () =>
-      selectedAgent?.system_prompt ||
       user?.system_prompt ||
       SYSTEM_PROMPT_DEFAULT,
-    [selectedAgent?.system_prompt, user?.system_prompt]
+    [user?.system_prompt]
   );
 
   // Search params handling
@@ -85,26 +82,12 @@ export function useChatCore({
     });
   }, []);
 
-  // Custom onFinish handler to attach agent data to agent messages
+  // Custom onFinish handler
   const handleFinish = useCallback(
     (message: Message) => {
-      // Attach agent data to agent messages
-      if (message.role === 'assistant' && selectedAgent) {
-        const messageWithAgent = {
-          ...message,
-          agent_id: selectedAgent.id,
-          agent: {
-            id: selectedAgent.id,
-            name: selectedAgent.name,
-            avatar_url: selectedAgent.avatar_url,
-          },
-        };
-        cacheAndAddMessage(messageWithAgent);
-      } else {
-        cacheAndAddMessage(message);
-      }
+      cacheAndAddMessage(message);
     },
-    [cacheAndAddMessage, selectedAgent]
+    [cacheAndAddMessage]
   );
 
   // Initialize useChat
@@ -131,28 +114,8 @@ export function useChatCore({
   // so the typing indicator appears while preflight (limits, chat ensure, uploads) run.
   const [uiIsSubmitted, setUiIsSubmitted] = useState(false);
 
-  // Transform messages to include agent data for agent messages
-  const messages = useMemo(() => {
-    return rawMessages.map((message) => {
-      // Only add agent data to agent messages that don't already have it
-      if (
-        message.role === 'assistant' &&
-        selectedAgent &&
-        !(message as any).agent_id
-      ) {
-        return {
-          ...message,
-          agent_id: selectedAgent.id,
-          agent: {
-            id: selectedAgent.id,
-            name: selectedAgent.name,
-            avatar_url: selectedAgent.avatar_url,
-          },
-        };
-      }
-      return message;
-    });
-  }, [rawMessages, selectedAgent]);
+  // Messages are used as-is
+  const messages = rawMessages;
 
   // Handle search params on mount
   useEffect(() => {
@@ -210,18 +173,7 @@ export function useChatCore({
       createdAt: new Date(),
       experimental_attachments:
         optimisticAttachments.length > 0 ? optimisticAttachments : undefined,
-      agent_id: selectedAgent?.id || null,
-      agent: selectedAgent
-        ? {
-            id: selectedAgent.id,
-            name: selectedAgent.name,
-            avatar_url: selectedAgent.avatar_url,
-          }
-        : null,
-    } as Message & {
-      agent_id: string | null;
-      agent: { id: string; name: string; avatar_url: string | null } | null;
-    };
+    } as Message;
 
     setMessages((prev) => [...prev, optimisticMessage]);
     // Trigger loader early
@@ -282,7 +234,6 @@ export function useChatCore({
           isAuthenticated,
           systemPrompt: systemPrompt || SYSTEM_PROMPT_DEFAULT,
           enableSearch,
-          agentId: selectedAgent?.id || null,
         },
         experimental_attachments: attachments || undefined,
       };
@@ -344,14 +295,6 @@ export function useChatCore({
         content: suggestion,
         role: 'user' as const,
         createdAt: new Date(),
-        agent_id: selectedAgent?.id || null,
-        agent: selectedAgent
-          ? {
-              id: selectedAgent.id,
-              name: selectedAgent.name,
-              avatar_url: selectedAgent.avatar_url,
-            }
-          : null,
       };
 
       setMessages((prev) => [...prev, optimisticMessage]);
@@ -388,7 +331,6 @@ export function useChatCore({
             model: selectedModel!,
             isAuthenticated,
             systemPrompt: SYSTEM_PROMPT_DEFAULT,
-            agentId: selectedAgent?.id || null,
           },
         };
 
@@ -416,7 +358,6 @@ export function useChatCore({
       isAuthenticated,
       setMessages,
       setIsSubmitting,
-      selectedAgent,
       router,
     ]
   );
@@ -440,7 +381,6 @@ export function useChatCore({
         model: selectedModel!,
         isAuthenticated,
         systemPrompt: systemPrompt || SYSTEM_PROMPT_DEFAULT,
-        agentId: selectedAgent?.id || null,
       },
     };
 
@@ -451,7 +391,6 @@ export function useChatCore({
     selectedModel,
     isAuthenticated,
     systemPrompt,
-    selectedAgent,
     reload,
     router,
   ]);

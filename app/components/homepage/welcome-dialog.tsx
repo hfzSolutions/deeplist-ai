@@ -16,20 +16,14 @@ import { useTheme } from 'next-themes';
 const benefits = [
   {
     icon: <Zap className="h-5 w-5" />,
-    title: 'Build Custom AI',
-    description: 'Create personalized AI agents for your specific tasks',
+    title: 'Discover AI Tools',
+    description: 'Find the best AI tools for your specific tasks',
     color: 'text-blue-600',
-  },
-  {
-    icon: <ArrowRightLeft className="h-5 w-5" />,
-    title: 'Switch Instantly',
-    description: 'Change between different AI models and agents seamlessly',
-    color: 'text-purple-600',
   },
   {
     icon: <Users className="h-5 w-5" />,
     title: 'Explore Community',
-    description: 'Discover what others have built and get inspired',
+    description: 'Discover tools shared by the community and get inspired',
     color: 'text-green-600',
   },
 ];
@@ -77,12 +71,11 @@ export function WelcomeDialog({
               Welcome to DeepList AI
             </p>
             <DialogTitle className="text-2xl font-bold text-foreground">
-              Your AI Customization Platform ✨
+              Your AI Tools Discovery Platform ✨
             </DialogTitle>
           </div>
           <DialogDescription className="text-muted-foreground">
-            Build custom AI agents, switch instantly, and explore what others
-            have created:
+            Discover AI tools and explore what the community has shared:
           </DialogDescription>
         </DialogHeader>
 

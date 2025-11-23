@@ -10,7 +10,7 @@ export type UserPreferences = {
 };
 
 export const defaultPreferences: UserPreferences = {
-  layout: 'sidebar',
+  layout: 'fullscreen',
   promptSuggestions: true,
   showToolInvocations: true,
   showConversationPreviews: true,

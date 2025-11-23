@@ -270,10 +270,10 @@ export function DialogExternalAITool({
           : formData;
         const result = await updateTool(tool.id, updatedFormData, logoFile);
         if (result) {
-          toast.success('External AI tool updated successfully');
+          toast.success('AI tool updated successfully');
           onOpenChange(false);
         } else {
-          toast.error('Failed to update external AI tool');
+          toast.error('Failed to update AI tool');
         }
       } else {
         // For new tools, logo will be undefined if logoRemoved is true (though this shouldn't happen for new tools)
@@ -283,10 +283,10 @@ export function DialogExternalAITool({
 
         const result = await createTool(updatedFormData, logoFile);
         if (result) {
-          toast.success('External AI tool created successfully');
+          toast.success('AI tool created successfully');
           onOpenChange(false);
         } else {
-          toast.error('Failed to create external AI tool');
+          toast.error('Failed to create AI tool');
         }
       }
     } catch (error) {
@@ -327,16 +327,16 @@ export function DialogExternalAITool({
   if (isMobile) {
     return (
       <Drawer open={open} onOpenChange={onOpenChange}>
-        <DrawerContent className="max-h-[90vh] flex flex-col">
+        <DrawerContent className="flex flex-col">
           <DrawerHeader className="border-b px-6 py-4">
             <DrawerTitle className="flex items-center gap-2">
               <Wrench size={20} />
-              {isEditing ? 'Edit External AI Tool' : 'Add External AI Tool'}
+              {isEditing ? 'Edit AI Tool' : 'Add AI Tool'}
             </DrawerTitle>
             <DrawerDescription>
               {isEditing
-                ? 'Update the details of your external AI tool.'
-                : 'Add a new external AI tool to your collection.'}
+                ? 'Update the details of your AI tool.'
+                : 'Add a new AI tool to your collection.'}
             </DrawerDescription>
           </DrawerHeader>
           <div className="flex-1 overflow-y-auto px-6 py-4">
@@ -534,16 +534,16 @@ export function DialogExternalAITool({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="flex max-h-[90vh] max-w-2xl flex-col overflow-hidden">
+      <DialogContent className="flex h-[80%] min-h-[480px] w-full flex-col gap-0 p-0 sm:max-w-[768px] overflow-hidden">
         <DialogHeader className="border-b px-6 py-4">
           <DialogTitle className="flex items-center gap-2">
             <Wrench size={20} />
-            {isEditing ? 'Edit External AI Tool' : 'Add External AI Tool'}
+            {isEditing ? 'Edit AI Tool' : 'Add AI Tool'}
           </DialogTitle>
           <DialogDescription>
             {isEditing
-              ? 'Update the details of your external AI tool.'
-              : 'Add a new external AI tool to your collection.'}
+              ? 'Update the details of your AI tool.'
+              : 'Add a new AI tool to your collection.'}
           </DialogDescription>
         </DialogHeader>
         <div className="flex-1 overflow-y-auto px-6 py-4">

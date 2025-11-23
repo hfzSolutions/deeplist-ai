@@ -22,42 +22,27 @@ import { Button } from '@/components/ui/button';
 const benefits = [
   {
     icon: <Zap className="h-8 w-8 text-blue-600" />,
-    title: 'Build Custom AI',
-    subtitle: 'Create personalized AI agents for your tasks',
+    title: 'Discover AI Tools',
+    subtitle: 'Find the best AI tools for your tasks',
     description:
-      'Design AI agents tailored to your specific needs. Set custom prompts, behaviors, and capabilities for any task.',
+      'Explore a curated collection of AI tools. Find specialized solutions for any task, from content creation to data analysis.',
     features: [
-      'Custom AI agents',
-      'Personalized prompts',
-      'Task-specific behaviors',
-      'Easy to create',
+      'Curated tool collection',
+      'Specialized solutions',
+      'Easy discovery',
+      'Regular updates',
     ],
     badge: 'Most Popular',
     gradient: 'from-blue-500 to-cyan-500',
   },
   {
-    icon: <ArrowRightLeft className="h-8 w-8 text-purple-600" />,
-    title: 'Switch Instantly',
-    subtitle: 'Change between AI models and agents seamlessly',
-    description:
-      'Switch between different AI models and your custom agents without losing context. Find the perfect AI for each task.',
-    features: [
-      'Switch models instantly',
-      'Keep conversation context',
-      'Use custom agents',
-      'Find the best AI',
-    ],
-    badge: 'Unique Feature',
-    gradient: 'from-purple-500 to-pink-500',
-  },
-  {
     icon: <Users className="h-8 w-8 text-green-600" />,
     title: 'Explore Community',
-    subtitle: 'Discover what others have built',
+    subtitle: 'Discover tools shared by the community',
     description:
-      'Browse AI agents and tools created by the community. Get inspired, learn from others, and find solutions for your needs.',
+      'Browse AI tools shared by the community. Get inspired, learn from others, and find solutions for your needs.',
     features: [
-      'Community creations',
+      'Community tools',
       'Get inspired',
       'Learn from others',
       'Find solutions',
@@ -68,13 +53,16 @@ const benefits = [
 ];
 
 const stats = [
-  { label: 'AI Models', value: '10+', icon: <Sparkles className="h-4 w-4" /> },
+  {
+    label: 'AI Tools',
+    value: '100+',
+    icon: <Sparkles className="h-4 w-4" />,
+  },
   {
     label: 'Active Users',
     value: '1K+',
     icon: <UsersIcon className="h-4 w-4" />,
   },
-  { label: 'Response Time', value: '<2s', icon: <Clock className="h-4 w-4" /> },
 ];
 
 export function BenefitsShowcase() {
@@ -86,9 +74,7 @@ export function BenefitsShowcase() {
           Why Choose DeepList AI?
         </h2>
         <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-          The only AI platform that lets you customize everything. Build custom
-          agents, switch instantly, and explore what the community has created -
-          all in one place.
+          Discover the best AI tools and explore what the community has shared - all in one place.
         </p>
       </div>
 
@@ -185,7 +171,7 @@ export function BenefitsShowcase() {
               window.location.href = '/store';
             }}
           >
-            Explore AI Agents
+            Explore Tools
           </Button>
         </div>
       </div>

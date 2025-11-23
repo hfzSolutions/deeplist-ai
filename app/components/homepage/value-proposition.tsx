@@ -4,31 +4,26 @@ import { Zap, ArrowRightLeft, Users, CheckCircle } from 'lucide-react';
 import { useTheme } from 'next-themes';
 
 export const VALUE_PROPOSITION = {
-  main: 'Customize Your AI',
-  subtitle: 'Build, switch, and personalize AI agents for your specific needs',
+  main: 'Discover AI Tools',
+  subtitle: 'Explore the best AI tools and find the perfect solution for your needs',
 
   benefits: [
     {
       icon: <Zap className="h-5 w-5" />,
-      title: 'Build Custom AI',
-      description: 'Create personalized AI agents for your specific tasks',
-    },
-    {
-      icon: <ArrowRightLeft className="h-5 w-5" />,
-      title: 'Switch Instantly',
-      description: 'Change between different AI models and agents seamlessly',
+      title: 'Discover Tools',
+      description: 'Find the best AI tools for your specific tasks',
     },
     {
       icon: <Users className="h-5 w-5" />,
       title: 'Explore Community',
-      description: 'Discover what others have built and get inspired',
+      description: 'Discover tools created by the community and get inspired',
     },
   ],
 
   // For use in CTAs and marketing
   cta: {
     primary: 'Login to Start',
-    secondary: 'Explore AI Agents',
+    secondary: 'Explore Tools',
   },
 
   // For use in social proof
