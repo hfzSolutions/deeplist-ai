@@ -49,7 +49,7 @@ export default function AuthErrorPage() {
         >
           <ArrowLeft className="size-5 text-white" />
           <span className="font-base ml-2 hidden text-sm sm:inline-block">
-            Back to Chat
+            Back to Home
           </span>
         </Link>
       </header>
